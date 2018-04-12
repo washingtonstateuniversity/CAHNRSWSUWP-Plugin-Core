@@ -111,11 +111,12 @@ class RFP_Post_Type extends Post_Type {
 
 		foreach ( $defaults as $key => $value ) {
 
+			// @codingStandardsIgnoreStart Nonce already verified before this is called
 			if ( ! empty( $_POST[ $key ] ) ) {
 
 				$clean[ $key ] = sanitize_text_field( $_POST[ $key ] );
 
-			} // End if
+			} // End if @codingStandardsIgnoreEnd
 		} // End foreach
 
 		return $clean;

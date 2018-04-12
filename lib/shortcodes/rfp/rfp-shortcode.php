@@ -90,7 +90,7 @@ class RFP_Shortcode {
 
 						$title = get_the_title();
 
-						$link_src = get_post_meta( $the_query->post->ID, '_redirect_to', true );;
+						$link_src = get_post_meta( $the_query->post->ID, '_redirect_to', true );
 
 						$excerpt = get_the_excerpt();
 
