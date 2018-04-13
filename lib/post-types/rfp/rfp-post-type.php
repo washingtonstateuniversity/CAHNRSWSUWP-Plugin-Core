@@ -88,7 +88,9 @@ class RFP_Post_Type extends Post_Type {
 	*/
 	protected function the_edit_form( $post, $post_meta ) {
 
-		$date = $post_meta['_post_date'];
+		$the_date = $post_meta['_post_date'];
+
+		$date = date( 'm/d/y', $the_date );
 
 		$redirect = $post_meta['_redirect_to'];
 
@@ -114,7 +116,15 @@ class RFP_Post_Type extends Post_Type {
 			// @codingStandardsIgnoreStart Nonce already verified before this is called
 			if ( ! empty( $_POST[ $key ] ) ) {
 
-				$clean[ $key ] = sanitize_text_field( $_POST[ $key ] );
+				$value = sanitize_text_field( $_POST[ $key ] );
+
+				if ( '_post_date' === $key ){
+
+					$value = strtotime( $value );
+
+				} // End if
+
+				$clean[ $key ] = $value;
 
 			} // End if @codingStandardsIgnoreEnd
 		} // End foreach
