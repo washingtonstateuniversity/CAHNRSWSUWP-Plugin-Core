@@ -56,13 +56,22 @@ class RFP_Shortcode {
 
 		$atts = shortcode_atts( $this->default_atts, $atts );
 
+		// Yesterdays timestamp
+		$yesterday = time() - ( 24 * 60 * 60 );
+
 		$query_args = array(
 			'posts_per_page' => $atts['count'],
 			'post_type' => 'rfp',
 			'post_status' => 'publish',
 			'orderby' => 'meta_value_num',
-			'meta_type' => 'DATE',
-			'meta_key' => '_post_date',
+			'meta_query' => array(
+				array(
+					'key' => '_post_date',
+					'value' => $yesterday,
+					'type' => 'numeric',
+					'compare' => '>',
+				),
+			),
 			'order' => 'ASC',
 		);
 
@@ -76,34 +85,22 @@ class RFP_Shortcode {
 
 				$the_query->the_post();
 
+				$title = get_the_title();
+
+				$link_src = get_post_meta( $the_query->post->ID, '_redirect_to', true );
+
+				$excerpt = get_the_excerpt();
+
 				$the_date = get_post_meta( $the_query->post->ID, '_post_date', true );
 
-				if ( ! empty( $the_date ) ) {
+				$date = date( 'D, d M Y', $the_date );
 
-					$date_time = new \DateTime( $the_date );
+				ob_start();
 
-					$now = new \DateTime();
+				include __DIR__ . '/item.php';
 
-					$now->sub( new \DateInterval( 'P1D' ) );
+				$html .= ob_get_clean();
 
-					if ( $date_time > $now ) {
-
-						$title = get_the_title();
-
-						$link_src = get_post_meta( $the_query->post->ID, '_redirect_to', true );
-
-						$excerpt = get_the_excerpt();
-
-						$date = date_format( $date_time, 'D, d M Y' );
-
-						ob_start();
-
-						include __DIR__ . '/item.php';
-
-						$html .= ob_get_clean();
-
-					} // End if
-				} // End if
 			} // End while
 
 			/* Restore original Post Data */
