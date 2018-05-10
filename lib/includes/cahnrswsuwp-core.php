@@ -63,6 +63,9 @@ class CAHNRSWSUWP_Core {
 		// Research Review post type
 		require_once core_get_plugin_path( '/lib/post-types/research-review/research-review-post-type.php' );
 
+		// Research Review post type
+		require_once core_get_plugin_path( '/lib/post-types/article/article-post-type.php' );
+
 	} // end add_post_types
 
 
