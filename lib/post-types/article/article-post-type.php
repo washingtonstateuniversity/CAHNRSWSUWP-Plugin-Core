@@ -56,6 +56,10 @@ class Article_Post_Type extends Post_Type {
 	*/
 	protected function the_edit_form( $post, $post_meta ) {
 
+		var_dump( get_post_meta( $post->ID, '_sources', true ) );
+
+		var_dump( get_post_meta( $post->ID ) );
+
 		$form_items_html = '';
 
 		for ( $i = 1; $i < 6; $i++ ) {
@@ -169,11 +173,15 @@ class Article_Post_Type extends Post_Type {
 			} // End if
 		} // End for
 
-		ob_start();
+		if ( ! empty( $media_contact_items_html ) ) {
 
-		include __dir__ . '/media-contact/media-contact-wrapper.php';
+			ob_start();
 
-		$html .= ob_get_clean();
+			include __dir__ . '/media-contact/media-contact-wrapper.php';
+
+			$html .= ob_get_clean();
+
+		}
 
 		return $html;
 
@@ -191,6 +199,8 @@ class Article_Post_Type extends Post_Type {
 	 */
 	protected function get_legacy_contact( $post_id, $i ) {
 
+		$source_meta = get_post_meta( $post_id, '_sources', true );
+
 		$mediacontact = array(
 			'firstname' => '',
 			'lastname'  => '',
@@ -199,37 +209,43 @@ class Article_Post_Type extends Post_Type {
 			'phone'     => '',
 		);
 
-		$legacy_name = get_post_meta( $post_id, 'name_' . $i, true );
+		if ( ! empty( $source_meta[ 'name_' . $i ] ) ) {
 
-		$person_info = explode( ', ', $legacy_name );
+			$legacy_name = $source_meta[ 'name_' . $i ];
 
-		$person_names = explode( ' ', $person_info[0] );
+			$person_info = explode( ', ', $legacy_name );
 
-		$mediacontact['firstname'] = $person_names[0];
+			$person_names = explode( ' ', $person_info[0] );
 
-		if ( ! empty( $person_names[1] ) ) {
+			$mediacontact['firstname'] = $person_names[0];
 
-			$mediacontact['lastname'] = $person_names[1];
+			if ( ! empty( $person_names[1] ) ) {
 
-		}
+				$mediacontact['lastname'] = $person_names[1];
 
-		if ( ! empty( $person_info[1] ) ) {
+			}
 
-			$mediacontact['title'] = $person_info[1];
+			if ( ! empty( $person_info[1] ) ) {
 
-		}
+				$mediacontact['title'] = $person_info[1];
 
-		$legacy_info = get_post_meta( $post_id, 'info_' . $i, true );
+			} // End if
+		} // End if
 
-		$person_contact = explode( ', ', $legacy_info );
+		if ( ! empty( $source_meta[ 'info_' . $i ] ) ) {
 
-		$mediacontact['phone'] = $person_contact[0];
+			$legacy_info = $source_meta[ 'info_' . $i ];
 
-		if ( ! empty( $person_contact[1] ) ) {
+			$person_contact = explode( ', ', $legacy_info );
 
-			$mediacontact['email'] = $person_contact[1];
+			$mediacontact['phone'] = $person_contact[0];
 
-		}
+			if ( ! empty( $person_contact[1] ) ) {
+
+				$mediacontact['email'] = $person_contact[1];
+
+			} // End if
+		} // End if
 
 		return $mediacontact;
 

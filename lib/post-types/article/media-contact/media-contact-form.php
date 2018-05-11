@@ -2,7 +2,7 @@
 
 ?><h2>Media Contacts</h2>
 <?php echo $form_items_html; ?>
-<button class="add-media">Add Contact</button>
+<button class="add-media">Add Additional Contact</button>
 <script>
 	jQuery('body').on(
 		'click',
