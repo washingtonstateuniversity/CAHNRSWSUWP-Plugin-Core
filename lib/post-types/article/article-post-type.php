@@ -119,9 +119,13 @@ class Article_Post_Type extends Post_Type {
 
 		global $post;
 
-		$media_contact_html = $this->get_media_contact_html( $post );
+		$article_html = '';
 
-		$content .= $media_contact_html;
+		$article_html .= $this->get_social_buttons_html( $post );
+
+		$article_html .= $this->get_media_contact_html( $post );
+
+		$content .= $article_html;
 
 		return $content;
 
@@ -250,6 +254,33 @@ class Article_Post_Type extends Post_Type {
 		return $mediacontact;
 
 	}
+
+
+	/**
+	 * @desc Get social buttons html
+	 * @since 0.0.3
+	 *
+	 * @param WP_Post $post
+	 *
+	 * @return string Html for social buttions
+	 */
+	protected function get_social_buttons_html( $post ) {
+
+		$title = \get_the_title( $post );
+
+		$url = \get_permalink( $post );
+
+		$utf_url = rawurlencode( $url );
+
+		ob_start();
+
+		include __dir__ . '/social-media/social-buttons.php';
+
+		$html = ob_get_clean();
+
+		return $html;
+
+	} // End get_social_buttons_html
 
 
 } // End RFP_Post_Type

@@ -105,6 +105,9 @@ class CAHNRSWSUWP_Core {
 		// Add Analytics
 		require_once core_get_plugin_path( '/lib/utilities/analytics/analytics-utility.php' );
 
+		// Add Analytics
+		require_once core_get_plugin_path( '/lib/utilities/open-graph/open-graph-utility.php' );
+
 	} // End add_utilites
 
 
