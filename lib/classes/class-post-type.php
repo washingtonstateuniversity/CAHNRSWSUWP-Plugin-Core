@@ -41,6 +41,12 @@ class Post_Type {
 	*/
 	protected function init_post_type() {
 
+		if ( method_exists( $this, 'set_default_meta' ) ) {
+
+			$this->set_default_meta();
+
+		} // End if
+
 		if ( method_exists( $this, 'set_labels' ) ) {
 
 			$this->set_labels();
@@ -68,6 +74,12 @@ class Post_Type {
 		if ( method_exists( $this, 'the_edit_form' ) ) {
 
 			add_action( 'edit_form_after_title', array( $this, 'edit_form' ) );
+
+		} // End if
+
+		if ( method_exists( $this, 'the_content_filter' ) ) {
+
+			add_filter( 'the_content', array( $this, 'do_filter_content' ), 10 );
 
 		} // End if
 
@@ -161,6 +173,21 @@ class Post_Type {
 	} // End register_post_type
 
 
+	public function do_filter_content( $content ) {
+
+		if ( is_singular( $this->slug ) ) {
+
+			$content = $this->the_content_filter( $content );
+
+		} // End if
+
+		remove_filter( 'the_content', array( $this, 'do_filter_content' ), 10 );
+
+		return $content;
+
+	} // End filter_content
+
+
 	/*
 	* @desc Check can register
 	* @since 0.0.1
@@ -197,6 +224,34 @@ class Post_Type {
 	} // End check_do_register
 
 
+	/**
+	 * @desc Santitize post meta from default atts. For more complex sanitation redeclare this in child class
+	 * @since 0.0.3
+	 *
+	 * @return array Sanitized values
+	 */
+	protected function sanitize_editor_values() {
+
+		$clean_meta = array();
+
+		$default_meta = $this->post_meta_defaults;
+
+		foreach ( $default_meta as $key => $default_value ) {
+
+			// @codingStandardsIgnoreStart // Nonce already checked
+			if ( isset( $_POST[ $key ] ) ) {
+
+				// @codingStandardsIgnoreEnd
+				$clean_meta[ $key ] = sanitize_text_field( $_POST[ $key ] );
+
+			} // End if
+		} // End foreach
+
+		return $clean_meta;
+
+	} // End sanitize_editor_values
+
+
 	public function save_post( $post_id, $post, $update ) {
 
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
@@ -230,16 +285,8 @@ class Post_Type {
 				} // End if
 			} // End if
 
-			// Default empty for clean values
-			$clean_values = array();
-
-			// If method for sanitizing form data exists do that
-			if ( method_exists( $this, 'sanitize_editor_values' ) ) {
-
-				// Sanitized form values
-				$clean_values = $this->sanitize_editor_values();
-
-			} // End if
+			// Sanitized form values
+			$clean_values = $this->sanitize_editor_values();
 
 			// check to make sure we have something to save
 			if ( ! empty( $clean_values ) ) {
