@@ -56,10 +56,6 @@ class Article_Post_Type extends Post_Type {
 	*/
 	protected function the_edit_form( $post, $post_meta ) {
 
-		var_dump( get_post_meta( $post->ID, '_sources', true ) );
-
-		var_dump( get_post_meta( $post->ID ) );
-
 		$form_items_html = '';
 
 		for ( $i = 1; $i < 6; $i++ ) {

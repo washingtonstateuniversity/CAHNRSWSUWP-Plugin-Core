@@ -238,8 +238,10 @@ class Post_Type {
 
 		foreach ( $default_meta as $key => $default_value ) {
 
+			// @codingStandardsIgnoreStart // Nonce already checked
 			if ( isset( $_POST[ $key ] ) ) {
 
+				// @codingStandardsIgnoreEnd
 				$clean_meta[ $key ] = sanitize_text_field( $_POST[ $key ] );
 
 			} // End if

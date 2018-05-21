@@ -1,7 +1,11 @@
 <?php namespace WSUWP\CAHNRSWSUWP_Plugin_Core;
 
 ?><h2>Media Contacts</h2>
-<?php echo $form_items_html; ?>
+<?php
+// @codingStandardsIgnoreStart // Already escaped
+echo $form_items_html; 
+// @codingStandardsIgnoreEnd
+?>
 <button class="add-media">Add Additional Contact</button>
 <script>
 	jQuery('body').on(
