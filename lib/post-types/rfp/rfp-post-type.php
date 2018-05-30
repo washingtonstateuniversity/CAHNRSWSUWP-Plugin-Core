@@ -88,9 +88,18 @@ class RFP_Post_Type extends Post_Type {
 	*/
 	protected function the_edit_form( $post, $post_meta ) {
 
-		$the_date = $post_meta['_post_date'];
+		// _post_date should be either a timestamp or empty string
+		if ( ! empty( $post_meta['_post_date'] ) ) {
 
-		$date = date( 'm/d/y', $the_date );
+			$the_date = absint( $post_meta['_post_date'] );
+
+			$date = date( 'm/d/y', $the_date );
+
+		} else {
+
+			$date = '';
+
+		} // End if
 
 		$redirect = $post_meta['_redirect_to'];
 
