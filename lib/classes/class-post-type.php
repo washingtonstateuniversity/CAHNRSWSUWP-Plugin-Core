@@ -267,7 +267,7 @@ class Post_Type {
 		} // End if
 
 		// Check the nonce
-		if ( check_admin_referer( 'cc_save_post_' . $post_id, 'cc_nonce' ) ) {
+		if ( wp_verify_nonce( $_REQUEST['cc_nonce'], 'cc_save_post_' . $post_id ) ) {
 
 			if ( 'page' === $_POST['post_type'] ) {
 
