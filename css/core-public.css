@@ -1,0 +1,71 @@
+/* -- Core Sub Layouts ----------------------------------------------- */
+
+.core-sublayout-wrapper:after {
+    content: "";
+    clear: both;
+    display: block;
+
+}
+
+/* Right column layout */
+
+.core-layout-right-column .core-layout-column.lc-column-one {
+    float: right;
+    width: 300px;
+    box-sizing: border-box;
+    padding-left: 18px;
+}
+
+.core-layout-right-column .core-layout-column.lc-column-two {
+    margin-right: 300px;
+} 
+
+/* Left column layout */
+
+.core-layout-left-column .core-layout-column.lc-column-one {
+    float: left;
+    width: 300px;
+    box-sizing: border-box;
+    padding-right: 18px;
+}
+
+.core-layout-left-column .core-layout-column.lc-column-two {
+    margin-left: 300px;
+}
+
+/* Menus */
+
+.core-sidebar-content ul.menu {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.core-sidebar-content ul.menu > li {
+    margin: 0;
+    padding: 0;
+}
+
+.core-sidebar-content ul.menu > li > a {
+    display: block;
+    padding: 8px 18px;
+}
+
+@media screen and (max-width: 989px) {
+
+    .core-layout-right-column .core-layout-column.lc-column-one,
+    .core-layout-left-column .core-layout-column.lc-column-one {
+        float: none;
+        width: auto;
+        box-sizing: border-box;
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    .core-layout-right-column .core-layout-column.lc-column-two,
+    .core-layout-left-column .core-layout-column.lc-column-two {
+        margin-right: 0;
+        margin-left: 0;
+    }
+    
+}
