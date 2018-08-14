@@ -25,7 +25,11 @@ if ( version_compare( PHP_VERSION, '5.3', '<' ) ) {
 
 	include_once __DIR__ . '/vendor/settings-api/settings-api-adapter.php';
 
-	include_once __DIR__ . '/lib/includes/cahnrswsuwp-core.php';
+	if ( is_admin() ) {
+
+		include_once __DIR__ . '/vendor/save-post/save-post.php';
+
+	} // End if
 
 	include_once __DIR__ . '/includes/modules/include-modules.php';
 

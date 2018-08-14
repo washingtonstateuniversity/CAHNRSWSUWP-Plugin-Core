@@ -2,6 +2,10 @@
 
 class Core_Module {
 
+	public $save_post = false;
+
+	public $post_types = array();
+
 	public $slug = false;
 
 	public $register_args = array(
@@ -24,6 +28,12 @@ class Core_Module {
 		if ( ! empty( $this->register_args['settings_page'] ) ) {
 
 			add_action( 'admin_init', array( $this, 'add_admin_settings' ) );
+
+		} // End if
+
+		if ( ! empty( $this->save_post ) && is_admin() ) {
+
+			$save_post = new \Save_Post_Data( $this->settings, $this->post_types, $this->get_nonce_name(), $this->get_nonce_action() );
 
 		} // End if
 
@@ -108,6 +118,20 @@ class Core_Module {
 		$page_slug = $this->get_settings_page_slug();
 
 		include dirname( __DIR__ ) . '/includes/modules/displays/module-settings.php';
+
+	}
+
+
+	public function get_nonce_name() {
+
+		return 'core_' . $this->slug;
+
+	}
+
+
+	public function get_nonce_action() {
+
+		return 'do_core_' . $this->slug;
 
 	}
 
