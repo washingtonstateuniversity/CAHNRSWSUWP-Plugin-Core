@@ -69,3 +69,55 @@
     }
     
 }
+
+/* -- Core Extension Publications ----------------------------------------------- */
+
+.extension-publication-item {
+    padding: 12px 8px;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+}
+.extension-publication-item:after {
+    content: "";
+    clear: both;
+    display: block;
+}
+
+.extension-publication-item > a {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    font-size: 0;
+    display: block;
+    z-index: 1;
+}
+.extension-publication-item > a:hover {
+    background-color: rgba(0,0,0,0.1);
+}
+
+.extension-publication-item .extension-pubication-image {
+    width: 75px;
+    height: 75px;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    float: left;
+    background-color: #ccc;
+}
+
+.extension-publication-item .extension-publication-content-wrapper {
+    margin-left: 90px;
+}
+
+.extension-publication-item .extension-publication-title {
+    color: #981e32;
+    font-weight: bold;
+}
+
+.extension-publication-item .extension-publication-summary {
+    font-size: 13px;
+    line-height: 16px;
+}

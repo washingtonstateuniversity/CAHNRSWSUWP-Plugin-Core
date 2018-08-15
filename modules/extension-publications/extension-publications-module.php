@@ -24,7 +24,7 @@ class Extension_Publications_Module extends Core_Module {
 
 	public $default_atts = array(
 		'per_page'       => -1,
-		'proticol'       => 'http',
+		'protocol'       => 'http',
 		'host'           => 'pubs.cahnrs.wsu.edu/publications',
 		'rest_path'      => '/wp-json/wp/v2/',
 		'endpoint'       => 'publication',
@@ -74,7 +74,7 @@ class Extension_Publications_Module extends Core_Module {
 		$title = $publication['title'];
 		$link = $publication['link'];
 		$image = $publication['img_src'];
-		$summary = '';
+		$summary = $publication['summary'];
 
 		ob_start();
 
@@ -104,20 +104,25 @@ class Extension_Publications_Module extends Core_Module {
 
 			if ( is_array( $publications_array ) ) {
 
-				foreach( $publications_array as $pub ) {
+				foreach ( $publications_array as $pub ) {
+
+					$summary = $pub->excerpt->rendered;
+
+					$summary = wp_strip_all_tags( $summary );
+
+					$summary = wp_trim_words( $summary, 25 );
 
 					$publication = array(
 						'title' => $pub->title->rendered,
 						'link' => $pub->link,
 						'img_src' => $pub->image_url,
+						'summary' => $summary,
 					);
 
 					$publications[] = $publication;
 
 				} // End foreach
-
 			} // end if
-
 		} // End if
 
 		return $publications;
@@ -141,7 +146,13 @@ class Extension_Publications_Module extends Core_Module {
 
 		} // End if
 
-		$request_url = $atts['proticol'] . '://' . $atts['host'] . $atts['rest_path'] . $atts['endpoint'];
+		if ( ! empty( $atts['topics'] ) ) {
+
+			$query_params['topic'] = $atts['topics'];
+
+		} // End if
+
+		$request_url = $atts['protocol'] . '://' . $atts['host'] . $atts['rest_path'] . $atts['endpoint'];
 
 		if ( ! empty( $query_params ) ) {
 
