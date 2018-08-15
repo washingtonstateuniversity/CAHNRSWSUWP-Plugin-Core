@@ -33,7 +33,7 @@ class Core_Module {
 
 		if ( ! empty( $this->save_post ) && is_admin() ) {
 
-			$save_post = new \Save_Post_Data( $this->settings, $this->post_types, $this->get_nonce_name(), $this->get_nonce_action() );
+			$save_post = new \Save_Post_Data( $this->post_settings, $this->post_types, $this->get_nonce_name(), $this->get_nonce_action() );
 
 		} // End if
 

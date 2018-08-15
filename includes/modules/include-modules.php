@@ -31,6 +31,8 @@ class Modules {
 
 		include_once $plugin_base . '/modules/expire-content/expire-content-module.php';
 
+		include_once $plugin_base . '/modules/extension-publications/extension-publications-module.php';
+
 	} // End add_modules
 
 

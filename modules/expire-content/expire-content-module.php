@@ -47,10 +47,10 @@ class Expire_Content_Module extends Core_Module {
 		2190   => '6 years',
 	);
 
-	public $settings = array(
-		'_expire_in' => array(
-			'ignore_empty' => true,
-		),
+	public $post_settings = array(
+		'_expire_in_month' => array(),
+		'_expire_in_day' => array(),
+		'_expire_in_year' => array(),
 	);
 
 
@@ -168,10 +168,10 @@ class Expire_Content_Module extends Core_Module {
 			'order'          => 'DESC',
 			'meta_query'     => array(
 				array(
-					'key'     => '_expire_in',
+					'key'     => '_expire_in_year',
 					'value'   => 0,
 					'type'    => 'numeric',
-					'compare' => '>=',
+					'compare' => '>',
 				),
 			),
 		);
@@ -182,13 +182,17 @@ class Expire_Content_Module extends Core_Module {
 
 			foreach ( $posts as $post ) {
 
-				$expire_days = get_post_meta( $post->ID, '_expire_in', true );
+				$expire_year = get_post_meta( $post->ID, '_expire_in_year', true );
 
-				$expire_date = date( 'Y-m-d', strtotime( '-' . $expire_days . ' days' ) );
+				$expire_month = get_post_meta( $post->ID, '_expire_in_month', true );
 
-				$post_date = get_the_date( 'Y-m-d', $post->ID );
+				$expire_day = get_post_meta( $post->ID, '_expire_in_day', true );
 
-				if ( $post_date < $expire_date ) {
+				$expire_date = $expire_year . '-' . $expire_month . '-' . $expire_day;
+
+				$date = date( 'Y-m-d' );
+
+				if ( $date > $expire_date ) {
 
 					$post_array = array(
 						'ID'          => $post->ID,
@@ -221,6 +225,12 @@ class Expire_Content_Module extends Core_Module {
 
 		} // End if
 
+		if ( isset( $_GET['do-expire'] ) ) {
+
+			$this->remove_custom_expired_posts();
+
+		} // End if
+
 	} // End init
 
 
@@ -228,7 +238,9 @@ class Expire_Content_Module extends Core_Module {
 
 		$expire_options = $this->expire_options;
 
-		$current_expire = get_post_meta( $post->ID, '_expire_in', true );
+		$current_expire_month = get_post_meta( $post->ID, '_expire_in_month', true );
+		$current_expire_day = get_post_meta( $post->ID, '_expire_in_day', true );
+		$current_expire_year = get_post_meta( $post->ID, '_expire_in_year', true );
 
 		include __DIR__ . '/displays/post-select-field.php';
 
