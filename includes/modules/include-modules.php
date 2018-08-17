@@ -33,6 +33,8 @@ class Modules {
 
 		include_once $plugin_base . '/modules/extension-publications/extension-publications-module.php';
 
+		include_once $plugin_base . '/modules/print-view/print-view-module.php';
+
 	} // End add_modules
 
 

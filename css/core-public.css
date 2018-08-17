@@ -77,6 +77,10 @@
     box-sizing: border-box;
     position: relative;
     overflow: hidden;
+    /* For print styling */
+    page-break-before: auto; /* 'always,' 'avoid,' 'left,' 'inherit,' or 'right' */
+    page-break-after: auto; /* 'always,' 'avoid,' 'left,' 'inherit,' or 'right' */
+    page-break-inside: avoid; /* or 'auto' */
 }
 .extension-publication-item:after {
     content: "";
@@ -120,4 +124,28 @@
 .extension-publication-item .extension-publication-summary {
     font-size: 13px;
     line-height: 16px;
+}
+
+/* -- Core Print View ----------------------------------------------- */
+
+a.core-show-print {
+    display: block;
+    font-size: 14px;
+}
+#core-print-view a.core-show-print {
+    display: none;
+}
+
+#core-print-view {
+    max-width: 1000px;
+    margin: 0 auto;
+    overflow: hidden;
+    padding: 30px;
+    box-sizing: border-box;
+    border: 1px solid #fff;
+}
+
+* {
+    -webkit-print-color-adjust: exact !important;   /* Chrome, Safari */
+    color-adjust: exact !important;                 /*Firefox*/
 }
