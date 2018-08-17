@@ -35,6 +35,8 @@ class Modules {
 
 		include_once $plugin_base . '/modules/print-view/print-view-module.php';
 
+		include_once $plugin_base . '/modules/web-rotate-360/web-rotate-360-module.php';
+
 	} // End add_modules
 
 
