@@ -108,4 +108,5 @@ class Settings_API_Adapter {
 		);
 
 	}
+
 }

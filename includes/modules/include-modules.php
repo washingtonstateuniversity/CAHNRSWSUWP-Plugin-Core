@@ -35,6 +35,8 @@ class Modules {
 
 		include_once $plugin_base . '/modules/web-rotate-360/web-rotate-360-module.php';
 
+		include_once $plugin_base . '/modules/publications/publications-module.php';
+
 		include_once $plugin_base . '/modules/grants/grants-module.php';
 
 		include_once $plugin_base . '/modules/taxonomies/taxonomies-module.php';

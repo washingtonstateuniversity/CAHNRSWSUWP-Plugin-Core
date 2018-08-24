@@ -171,14 +171,6 @@ class Save_Post_Data {
 	} // End sanitize_request_value
 
 
-	/*public function sanitize_array( $array ) {
-
-		$clean_array = array_map( 'sanitize_text_field', wp_unslash( $array ) );
-
-		return $clean_array;
-
-	} // End sanitize_array*/
-
 	public function sanitize_assoc_array( $array ) {
 
 		$clean_array = array();
