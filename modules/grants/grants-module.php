@@ -45,6 +45,25 @@ class Grants_Module extends Core_Module {
 		),
 	);
 
+	protected $save_args = array(
+		'post_types'             => array( 'grants' ),
+		'nonce_name'             => 'core_grants_module',
+		'nonce_action'           => 'core_grants_module_save_post',
+		'save_setting_callback'  => 'save_grant_setting',
+		'add_actions'            => true,
+	);
+
+
+	protected $post_settings = array(
+		'_grant' => array(
+			'sanitize_type'      => 'custom',
+			'default'            => '',
+			'check_isset'        => true,
+			'ignore_empty'       => true,
+			'sanitize_callback'  => 'sanitize_grants_post_meta',
+		),
+	);
+
 
 	/**
 	 * Init the module. This is called after from the 'init' action in the parent class.
@@ -63,7 +82,7 @@ class Grants_Module extends Core_Module {
 
 			/**
 			 * Check to see if we are trying to edit a post and start adding the
-			 * metabox. This is to keep from adding necessary actions to WP.
+			 * metabox. This is to keep from adding unnecessary actions to WP.
 			 */
 			// Start adding metabox to post edit page.
 			add_action( 'load-post.php', array( $this, 'init_metabox' ) );
@@ -74,6 +93,19 @@ class Grants_Module extends Core_Module {
 		} // End if
 
 	} // End init
+
+
+	public function sanitize_grants_post_meta( $key, $sent_value ) {
+
+		$clean = array(
+			'project_id'       => ( ! empty( $sent_value['project_id'] ) ) ? sanitize_text_field( $sent_value['project_id'] ) : '',
+			'annual_entries'   => ( ! empty( $sent_value['annual_entries'] ) ) ? $this->save_api->sanitize_array( $sent_value['annual_entries'] ) : array(),
+			'additional_funds' => ( ! empty( $sent_value['additional_funds'] ) ) ? $this->save_api->sanitize_array( $sent_value['additional_funds'] ) : array(),
+		);
+
+		return $clean;
+
+	} // End sanitize_grants_post_meta
 
 
 	/**
@@ -104,6 +136,13 @@ class Grants_Module extends Core_Module {
 	} // End add_grant_meta_box
 
 
+	public function save_grant_setting( $key, $value, $post_id, $data, $settings ) {
+
+		return $value;
+
+	} // End save_grant_setting
+
+
 	/**
 	 * Add the metabox for the Grants page.
 	 * @since 0.0.1
@@ -115,8 +154,13 @@ class Grants_Module extends Core_Module {
 		// Check if grants post type
 		if ( 'grants' === $post->post_type ) {
 
+			// Get the grants meta data - stored as an array under a single key.
+			$grants_meta = get_post_meta( $post->ID, '_grant', true );
+
+			var_dump( $grants_meta );
+
 			// Add nonce field to metabox.
-			wp_nonce_field( 'custom_nonce_action', 'custom_nonce' );
+			wp_nonce_field( 'core_grants_module_save_post', 'core_grants_module' );
 
 			$publications_content = ''; // string HTML for publications.
 			$funding_content      = ''; // string HTML for funding.
