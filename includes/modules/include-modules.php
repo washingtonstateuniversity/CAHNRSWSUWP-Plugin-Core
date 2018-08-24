@@ -27,8 +27,6 @@ class Modules {
 
 		include_once $plugin_base . '/modules/sub-layouts/sub-layouts-module.php';
 
-		include_once $plugin_base . '/modules/publications/publications-module.php';
-
 		include_once $plugin_base . '/modules/expire-content/expire-content-module.php';
 
 		include_once $plugin_base . '/modules/extension-publications/extension-publications-module.php';
@@ -36,6 +34,12 @@ class Modules {
 		include_once $plugin_base . '/modules/print-view/print-view-module.php';
 
 		include_once $plugin_base . '/modules/web-rotate-360/web-rotate-360-module.php';
+
+		include_once $plugin_base . '/modules/grants/grants-module.php';
+
+		include_once $plugin_base . '/modules/taxonomies/taxonomies-module.php';
+
+		include_once $plugin_base . '/modules/advanced-archive/advanced-archive-module.php';
 
 	} // End add_modules
 

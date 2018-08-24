@@ -136,4 +136,11 @@ class Core_Module {
 	}
 
 
+	public function get_settings() {
+
+		return $this->settings;
+
+	}
+
+
 } // End Core_Module
