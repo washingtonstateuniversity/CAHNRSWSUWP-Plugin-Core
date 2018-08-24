@@ -14,13 +14,27 @@ class Scripts {
 
 		add_action( 'wp_enqueue_scripts', array( $this, 'add_public_scripts' ) );
 
+		add_action( 'admin_enqueue_scripts', array( $this, 'add_admin_scripts' ) );
+
 	}
 
 
-	public function add_public_scripts() {
+	public function add_public_scripts( $hook ) {
 
 		// TODO make version pull from plugin version
 		wp_enqueue_style( 'core-css', ccore_get_plugin_url() . '/css/core-public.css', array(), '0.0.1' );
+
+	} // End add_public_scripts
+
+
+	public function add_admin_scripts( $hook ) {
+
+		if ( 'post-new.php' === $hook || 'post.php' == $hook ) {
+
+			// TODO make version pull from plugin version
+			wp_enqueue_style( 'core-admin-post-editor-css', ccore_get_plugin_url() . '/css/core-edit-post.css', array(), '0.0.1' );
+
+		} // End if
 
 	} // End add_public_scripts
 

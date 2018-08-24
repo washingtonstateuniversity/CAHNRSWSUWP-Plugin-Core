@@ -64,7 +64,7 @@ class Template_Module extends Core_Module {
 
 		$settings_adapter->register_settings( // Don't touch | Registers all of your settings from $this->settings
 			$page_slug,
-			$this->settings
+			$this->get_settings()
 		);
 
 		$settings_adapter->add_section( // Edit This | Add a custom section

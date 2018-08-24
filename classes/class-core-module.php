@@ -8,6 +8,8 @@ class Core_Module {
 
 	public $slug = false;
 
+	protected $save = false;
+
 	public $register_args = array(
 		'icon'           => '',
 		'label'          => 'Why you no add Label?',
@@ -20,6 +22,11 @@ class Core_Module {
 
 	public $settings = array();
 
+	protected $post_settings = array();
+
+	protected $save_args = array();
+
+	protected $save_api = false;
 
 	public function __construct() {
 
@@ -31,15 +38,63 @@ class Core_Module {
 
 		} // End if
 
-		if ( ! empty( $this->save_post ) && is_admin() ) {
+		if ( is_admin() && ! empty( $this->save_args ) ) {
 
-			$save_post = new \Save_Post_Data( $this->post_settings, $this->post_types, $this->get_nonce_name(), $this->get_nonce_action() );
+			$this->do_save_post_module();
 
 		} // End if
 
 		add_action( 'init', array( $this, 'init_module' ), $this->module_settings['init_priority'] );
 
 	} // End construct
+
+
+	protected function do_save_post_module() {
+
+		if ( is_admin() ) {
+
+			if ( ! empty( $this->save_args ) ) {
+
+				$default_save_args = array(
+					'post_types'             => array(),
+					'nonce_name'             => '',
+					'nonce_action'           => '',
+					'save_setting_callback'  => false,
+					'add_actions'           => true,
+				);
+
+				if ( ! empty( $this->save_args['save_setting_callback'] ) && ! is_array( $this->save_args['save_setting_callback'] ) ) {
+
+					$this->save_args['save_setting_callback'] = array( $this, $this->save_args['save_setting_callback'] );
+
+				} // End if
+
+				$save_args = array_merge( $default_save_args, $this->save_args );
+
+				$save_settings = $this->post_settings;
+
+				foreach ( $save_settings as $key => $setting ) {
+
+					if ( ! empty( $setting['sanitize_callback'] ) && ! is_array( $setting['sanitize_callback'] ) ) {
+
+						$save_settings[ $key ]['sanitize_callback'] = array( $this, $setting['sanitize_callback'] );
+
+					} // End if
+				} // End foreach
+
+				$this->save_api = new \Save_Post_Data(
+					$save_settings,
+					$save_args['post_types'],
+					$save_args['nonce_name'],
+					$save_args['nonce_action'],
+					$save_args['save_setting_callback'],
+					$save_args['add_actions']
+				);
+
+			} // End if
+		} // End if
+
+	} // End do_save_post_module
 
 
 	public function add_admin_settings() {
@@ -132,6 +187,13 @@ class Core_Module {
 	public function get_nonce_action() {
 
 		return 'do_core_' . $this->slug;
+
+	}
+
+
+	public function get_settings() {
+
+		return $this->settings;
 
 	}
 
