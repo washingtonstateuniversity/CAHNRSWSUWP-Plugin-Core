@@ -29,6 +29,19 @@ class Publications_Module extends Core_Module {
 		),
 	);
 
+	protected $save_args = array(
+		'post_types'             => array( 'publication' ),
+		'nonce_name'             => 'publication_info',
+		'nonce_action'           => 'save_publication_info',
+	);
+
+
+	protected $post_settings = array(
+		'_publication' => array(
+			'sanitize_type'      => 'array',
+			'ignore_empty'       => true,
+		),
+	);
 	/**
 	 * Init the module here
 	 */
@@ -60,10 +73,13 @@ class Publications_Module extends Core_Module {
         // Check if grants post type
         if ( 'publication' === $post->post_type ) {
             // Add nonce field to metabox.
-            wp_nonce_field( 'custom_nonce_action', 'custom_nonce' );
-            $url_content = ''; // string HTML for publications.
-            $feature_content      = ''; // string HTML for funding.
-			$feature_content       = ''; // string HTML for impact.
+			wp_nonce_field( 'save_publication_info', 'publication_info' );
+			
+			$publication = get_post_meta( $post->ID, '_publication', true );
+
+            $url_content = $publication['url_content']; // string HTML for publications.
+            $feature_content      = $publication['feature_content']; // string HTML for funding.
+			$external_resources       = $publication['external_resources']; // string HTML for impact.
             include __DIR__ . '/displays/publications-meta-box.php';
         } // End if
     } // End if
