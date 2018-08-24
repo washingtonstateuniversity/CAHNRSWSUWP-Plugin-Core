@@ -37,6 +37,8 @@ class Modules {
 
 		include_once $plugin_base . '/modules/web-rotate-360/web-rotate-360-module.php';
 
+		include_once $plugin_base . '/modules/publications/publications-module.php';
+
 	} // End add_modules
 
 
