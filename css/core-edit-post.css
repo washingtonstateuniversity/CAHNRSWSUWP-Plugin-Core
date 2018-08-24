@@ -31,7 +31,7 @@
     font-weight: bold;
 }
 
-.core-field > input,
+.core-field > input[type="text"],
 .core-field > select {
     width: 90%;
 }
