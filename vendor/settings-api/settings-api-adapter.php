@@ -11,6 +11,10 @@ class Settings_API_Adapter {
 
 		include_once 'classes/class-settings-api-select-field.php';
 
+		include_once 'classes/class-settings-api-multi-check-field.php';
+
+		include_once 'classes/class-settings-api-custom-field.php';
+
 	}
 
 	public function register_setting( $group, $id, $args ) {
@@ -75,4 +79,34 @@ class Settings_API_Adapter {
 		);
 
 	}
+
+	public function add_multi_check_field( $id, $label, $page, $section, $options, $current_value, $args = array(), $callback = false ) {
+
+		$field = new Settings_API_Multi_Check_Field(
+			$id,
+			$label,
+			$page,
+			$section,
+			$options,
+			$current_value,
+			$args,
+			$callback
+		);
+
+	}
+
+
+	public function add_custom_field( $id, $label, $page, $section, $args = array(), $callback = false ) {
+
+		$field = new Settings_API_Custom_Field(
+			$id,
+			$label,
+			$page,
+			$section,
+			$args,
+			$callback
+		);
+
+	}
+
 }

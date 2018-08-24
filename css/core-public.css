@@ -149,3 +149,20 @@ a.core-show-print {
     -webkit-print-color-adjust: exact !important;   /* Chrome, Safari */
     color-adjust: exact !important;                 /*Firefox*/
 }
+
+/* -- Core Advanced Archive ----------------------------------------------- */
+.core-advanced-archive-filter-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding: 18px 0;
+}
+.core-advanced-archive-filter {
+    flex-basis: 175px;
+}
+.core-advanced-archive-filter label {
+    display: block;
+}
+.core-advanced-archive-filter select {
+    width: 90%;
+}
