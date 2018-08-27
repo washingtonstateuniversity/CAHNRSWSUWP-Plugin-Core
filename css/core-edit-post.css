@@ -22,6 +22,10 @@
     padding: 16px 0;
 }
 
+.core-field.core-field-tight {
+    padding: 4px 0;
+}
+
 .core-field.core-wp-editor-field {
     width: 100%;
 }
