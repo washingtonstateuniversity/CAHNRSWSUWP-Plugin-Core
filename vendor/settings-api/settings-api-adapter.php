@@ -11,6 +11,8 @@ class Settings_API_Adapter {
 
 		include_once 'classes/class-settings-api-select-field.php';
 
+		include_once 'classes/class-settings-api-checkbox-field.php';
+
 		include_once 'classes/class-settings-api-multi-check-field.php';
 
 		include_once 'classes/class-settings-api-custom-field.php';
@@ -89,6 +91,22 @@ class Settings_API_Adapter {
 			$section,
 			$options,
 			$current_value,
+			$args,
+			$callback
+		);
+
+	}
+
+
+	public function add_checkbox_field( $id, $label, $page, $section, $current_value, $value = 1, $args = array(), $callback = false ) {
+
+		$field = new Settings_API_Checkbox_Field(
+			$id,
+			$label,
+			$page,
+			$section,
+			$current_value,
+			$value,
 			$args,
 			$callback
 		);

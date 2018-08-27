@@ -45,22 +45,23 @@ class Grants_Module extends Core_Module {
 		),
 	);
 
+	// @var array $save_args Passed to the Save_Post_API
 	protected $save_args = array(
-		'post_types'             => array( 'grants' ),
-		'nonce_name'             => 'core_grants_module',
-		'nonce_action'           => 'core_grants_module_save_post',
-		'save_setting_callback'  => 'save_grant_setting',
-		'add_actions'            => true,
+		'post_types'             => array( 'grants' ), // Post types to do save on
+		'nonce_name'             => 'core_grants_module', // Nonce name used on the metabox or edit form 
+		'nonce_action'           => 'core_grants_module_save_post', // Nonce action used on the metabox or edit form 
+		'save_setting_callback'  => 'save_grant_setting', // Custom callback for editing data before save
+		'add_actions'            => true, // Add save actions. Set to false if you want to add actions manually
 	);
 
-
+	// @var $post_settings Settings for the Save_Post_API to use. 
 	protected $post_settings = array(
-		'_grant' => array(
-			'sanitize_type'      => 'custom',
-			'default'            => '',
-			'check_isset'        => true,
-			'ignore_empty'       => true,
-			'sanitize_callback'  => 'sanitize_grants_post_meta',
+		'_grant' => array( // Settings key
+			'sanitize_type'      => 'custom', // Type of data - used to sanitize the data
+			'default'            => '', // Default value
+			'check_isset'        => true, // Do a check if isset, otherwise will use default value 
+			'ignore_empty'       => true, // Ignore if data is an empty string
+			'sanitize_callback'  => 'sanitize_grants_post_meta', // Custom sanitization callback 
 		),
 	);
 
@@ -95,6 +96,10 @@ class Grants_Module extends Core_Module {
 	} // End init
 
 
+	/**
+	 * Sanitize the post data before saving. This is a custom callback passed in the 'sanitize_callback' of the setting. 
+	 * @since 0.0.1
+	 */
 	public function sanitize_grants_post_meta( $key, $sent_value ) {
 
 		$clean = array(
@@ -156,8 +161,6 @@ class Grants_Module extends Core_Module {
 
 			// Get the grants meta data - stored as an array under a single key.
 			$grants_meta = get_post_meta( $post->ID, '_grant', true );
-
-			var_dump( $grants_meta );
 
 			// Add nonce field to metabox.
 			wp_nonce_field( 'core_grants_module_save_post', 'core_grants_module' );
