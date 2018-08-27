@@ -189,7 +189,7 @@ class Publications_Module extends Core_Module {
 	
 		$topics_args = array(
 			'hierarchical'      => true,
-			'labels'            => topic_labels,
+			'labels'            => $topic_labels,
 			'show_ui'           => true,
 			'show_admin_column' => true,
 			'query_var'         => true,
