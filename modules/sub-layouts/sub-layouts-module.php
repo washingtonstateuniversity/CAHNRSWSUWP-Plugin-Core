@@ -41,7 +41,7 @@ class Sub_Layouts_Module extends Core_Module {
 		),
 	);
 
-	// @var array Settings for the 'settings_page' to register and save. 
+	// @var array Settings for the 'settings_page' to register and save.
 	public $settings = array(
 		'core_sublayout_format' => array(
 			'type'              => 'string',
@@ -102,20 +102,20 @@ class Sub_Layouts_Module extends Core_Module {
 	// @var array $save_args Passed to the Save_Post_API
 	protected $save_args = array(
 		'post_types'             => array( 'post', 'page' ), // Post types to do save on
-		'nonce_name'             => 'core_sublayout_module', // Nonce name used on the metabox or edit form 
+		'nonce_name'             => 'core_sublayout_module', // Nonce name used on the metabox or edit form
 		'nonce_action'           => 'core_sublayout_module_save_post', // Nonce action used on the metabox or edit form
 	);
 
-	// @var $post_settings Settings for the Save_Post_API to use. 
+	// @var $post_settings Settings for the Save_Post_API to use.
 	protected $post_settings = array(
 		'_core_sublayout' => array( // Settings key
 			'sanitize_type'      => 'text', // Type of data - used to sanitize the data
-			'default'            => '', // Default value 
+			'default'            => '', // Default value
 			'ignore_empty'       => true, // Ignore if data is an empty string
 		),
 		'_core_sublayout_menu' => array( // Settings key
 			'sanitize_type'      => 'text', // Type of data - used to sanitize the data
-			'default'            => '', // Default value 
+			'default'            => '', // Default value
 			'ignore_empty'       => true, // Ignore if data is an empty string
 		),
 	);
@@ -212,7 +212,7 @@ class Sub_Layouts_Module extends Core_Module {
 			);
 
 			include __DIR__ . '/displays/column-menu.php';
-		
+
 		} // End if
 
 	}
@@ -356,7 +356,7 @@ class Sub_Layouts_Module extends Core_Module {
 
 				$a_sublayout = get_post_meta( $a_post_id, '_core_sublayout', true );
 
-				if ( ! empty( $a_sublayout ) || 'default' === $a_sublayout  ) {
+				if ( ! empty( $a_sublayout ) || 'default' === $a_sublayout ) {
 
 					$sublayout = $a_sublayout;
 
