@@ -56,9 +56,32 @@ class Publications_Module extends Core_Module {
 
 		}
 
+		add_filter( 'template_include', array( $this, 'publication_url_redirect' ), 99 );
+
 		// Do module stuff here
 
 	} // End init
+
+	function publication_url_redirect( $template ) {
+		if (is_singular ( 'publication' ) ) {
+
+			$post_id = get_the_ID();
+
+			$publication = get_post_meta( $post_id, '_publication', true );
+
+			$url_content = $publication['url_content'];
+
+			var_dump ($url_content);
+
+			if  ( ! empty( $url_content )) {
+				if ( wp_redirect( $url_content ) ) {
+					exit;
+				}
+
+		   }
+		} 
+		return $template;
+	}
 
 	public function add_grant_meta_box() {
         // Wp action for adding metabox.
