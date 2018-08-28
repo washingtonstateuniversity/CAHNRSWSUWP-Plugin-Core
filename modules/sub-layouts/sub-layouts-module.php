@@ -259,7 +259,7 @@ class Sub_Layouts_Module extends Core_Module {
 
 		$menu = get_post_meta( $post_id, $meta_key, true );
 
-		$allow_inherit = get_option( 'core_menu_inherit' );
+		$allow_inherit = get_option( 'core_sublayout_inherit' );
 
 		if ( ( empty( $menu ) || 'default' === $menu ) && ! empty( $allow_inherit ) ) {
 
