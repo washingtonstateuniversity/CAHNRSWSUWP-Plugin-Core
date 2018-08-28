@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Publications_Module extends Core_Module {
 
-	public $slug = 'core_publications'; // The ID for the module _ only
+	public $slug = 'core_pubs'; // The ID for the module _ only
 
 	public $register_args = array(
 		'label'          => 'Publications', // Edit This | Shows on activate module panel
@@ -30,14 +30,14 @@ class Publications_Module extends Core_Module {
 	);
 
 	protected $save_args = array(
-		'post_types'             => array( 'publication' ),
+		'post_types'             => array( 'publications' ),
 		'nonce_name'             => 'publication_info',
-		'nonce_action'           => 'save_publication_info',
+		'nonce_action'           => 'save_pub_info',
 	);
 
 
 	protected $post_settings = array(
-		'_publication' => array(
+		'_pub' => array(
 			'sanitize_type'      => 'array',
 			'ignore_empty'       => true,
 		),
@@ -48,7 +48,7 @@ class Publications_Module extends Core_Module {
 	public function init() { 
 		
 		$this->register_post_type();
-		$this->create_publications_taxonomies();
+		$this->create_pubs_taxonomies();
 
 		if ( is_admin() ) {
 
@@ -63,13 +63,13 @@ class Publications_Module extends Core_Module {
 	} // End init
 
 	function publication_url_redirect( $template ) {
-		if (is_singular ( 'publication' ) ) {
+		if (is_singular ( 'publications' ) ) {
 
 			$post_id = get_the_ID();
 
-			$publication = get_post_meta( $post_id, '_publication', true );
+			$publication = get_post_meta( $post_id, '_pub', true );
 
-			$url_content = $publication['url_content'];
+			$url_content = $publication['url'];
 
 			var_dump ($url_content);
 
@@ -86,23 +86,23 @@ class Publications_Module extends Core_Module {
 	public function add_grant_meta_box() {
         // Wp action for adding metabox.
         add_meta_box(
-            'core_publication_info', // id
+            'core_pub_info', // id
             'Publication Information', // label
-            array( $this, 'the_publication_metabox' ) // callback to render content from metabox
+            array( $this, 'the_pub_metabox' ) // callback to render content from metabox
         );
 	} // End add_grant_meta_box
 
-	public function the_publication_metabox( $post ) {
+	public function the_pub_metabox( $post ) {
         // Check if grants post type
-        if ( 'publication' === $post->post_type ) {
+        if ( 'publications' === $post->post_type ) {
             // Add nonce field to metabox.
-			wp_nonce_field( 'save_publication_info', 'publication_info' );
+			wp_nonce_field( 'save_pub_info', 'publication_info' );
 			
-			$publication = get_post_meta( $post->ID, '_publication', true );
+			$publication = get_post_meta( $post->ID, '_pub', true );
 
-            $url_content = $publication['url_content']; // string HTML for publications.
-            $feature_content      = $publication['feature_content']; // string HTML for funding.
-			$external_resources       = $publication['external_resources']; // string HTML for impact.
+            $url_content = $publication['url']; // string HTML for publications.
+            $feature_content      = $publication['featured']; // string HTML for funding.
+			$external_resources       = $publication['external']; // string HTML for impact.
             include __DIR__ . '/displays/publications-meta-box.php';
         } // End if
     } // End if
@@ -140,10 +140,10 @@ class Publications_Module extends Core_Module {
 			'supports'           => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'comments' )
 		);
 	
-		register_post_type( 'publication', $args );
+		register_post_type( 'publications', $args );
 	}  // End register_post_type
 
-	protected function create_publications_taxonomies() {
+	protected function create_pubs_taxonomies() {
 
 		//publication-authors
 		$authors_labels = array(
@@ -168,7 +168,7 @@ class Publications_Module extends Core_Module {
 			'query_var'         => true,
 		);
 	
-		register_taxonomy( 'publication-authors', array ( 'publication' ), $authors_args );
+		register_taxonomy( 'publication-authors', array ( 'publications' ), $authors_args );
 	
 		//taxonomy=publication-program-areas
 		$program_areas_labels = array(
@@ -193,7 +193,7 @@ class Publications_Module extends Core_Module {
 			'query_var'         => true,
 		);
 	
-		register_taxonomy( 'publication-program-areas', array ( 'publication' ), $program_areas_args );
+		register_taxonomy( 'publication-program-areas', array ( 'publications' ), $program_areas_args );
 	
 		//taxonomy=publication-topics
 		$topic_labels = array(
@@ -218,7 +218,7 @@ class Publications_Module extends Core_Module {
 			'query_var'         => true,
 		);
 	
-		register_taxonomy( 'publication-topics', array ( 'publication' ), $topics_args );
+		register_taxonomy( 'publication-topics', array ( 'publications' ), $topics_args );
 	
 		//taxonomy=keywords
 		$keyword_labels = array(
@@ -244,9 +244,9 @@ class Publications_Module extends Core_Module {
 			'rewrite'           => array( 'slug' => 'keyword' ),
 		);
 	
-		register_taxonomy( 'publication-keywords', array ( 'publication' ), $keyword_args );
+		register_taxonomy( 'publication-keywords', array ( 'publications' ), $keyword_args );
 	
-	} // end create_publications_taxonomies
+	} // end create_pubs_taxonomies
 
 	// --------------- //
 
