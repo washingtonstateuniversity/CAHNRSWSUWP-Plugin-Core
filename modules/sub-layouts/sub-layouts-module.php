@@ -122,9 +122,9 @@ class Sub_Layouts_Module extends Core_Module {
 
 	// @var array Sublayouts available in the theme.
 	public $sub_layouts = array(
-		'default'     => 'Default',
-		'left-column' => 'Left Column',
-		'right-column' => 'Right Column',
+		'default'      => 'Default',
+		'left-column'  => 'Sidebar Left',
+		'right-column' => 'Sidebar Right',
 	);
 
 
@@ -548,7 +548,7 @@ class Sub_Layouts_Module extends Core_Module {
 
 		$settings_adapter->add_checkbox_field(
 			'core_sublayout_inherit',
-			'Inherit Sub Layout Data',
+			'Inherit Parent Layout and Menu',
 			$page_slug,
 			$section,
 			get_option( 'core_sublayout_inherit' )
