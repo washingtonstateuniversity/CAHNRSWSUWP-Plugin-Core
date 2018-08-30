@@ -150,6 +150,23 @@ a.core-show-print {
     color-adjust: exact !important;                 /*Firefox*/
 }
 
+/* -- Core Publications ----------------------------------------------- */
+.core-publication-item {
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.core-publication-item .core-publication-link a:hover {
+    background-color: rgba(0,0,0,0.1);
+}
+
+.core-publication-item h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #981e32;
+}
+
+
 /* -- Core Advanced Archive ----------------------------------------------- */
 .core-advanced-archive-filter-wrapper {
     display: flex;

@@ -7,11 +7,11 @@
 			</div>
             <div class="core-field core-text-field">
 				<label>Feature</label>
-				<input type=checkbox name="_publication[featured]" value="1" <?php checked('1', $feature_content );?>>
+				<input type=checkbox name="_publication[featured]" value="yes" <?php checked('yes', $feature_content );?>>
 			</div>
             <div class="core-field core-text-field">
 				<label>External Resource</label>
-				<input type=checkbox name="_publication[external]" value="1" <?php checked('1', $external_resources );?>>
+				<input type=checkbox name="_publication[external]" value="yes" <?php checked('yes', $external_resources );?>>
 			</div>
 
         </div>

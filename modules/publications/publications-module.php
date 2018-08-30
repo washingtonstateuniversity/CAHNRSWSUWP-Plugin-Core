@@ -58,9 +58,129 @@ class Publications_Module extends Core_Module {
 
 		add_filter( 'template_include', array( $this, 'publication_url_redirect' ), 99 );
 
+		add_shortcode( 'core_publications' , array( $this, 'render_core_publications_shortcode' ) );
+
 		// Do module stuff here
 
 	} // End init
+
+
+	public function render_core_publications_shortcode( $atts, $content, $tag ) {
+
+		$default_atts = array(
+			'keywords'         => '',
+			'title'            => '',
+			'title_tag'        => 'h2',
+			'count'            => '100',
+			'featured_only'    => '',
+			'exclude_featured' => '',
+		);
+
+		$atts = shortcode_atts( $default_atts, $atts, $tag );
+
+		$html = '';
+
+		if ( $atts['title'] ) {
+
+			$html .= '<' . esc_html( $atts['title_tag'] ) . '>' . esc_html( $atts['title'] ) . '</' . esc_html( $atts['title_tag'] ) . '>';
+
+		} // End if
+
+		$query_args = $this->get_publications_shortcode_query( $atts );
+
+		$the_query = new \WP_Query( $query_args );
+
+		// The Loop
+		if ( $the_query->have_posts() ) {
+
+			while ( $the_query->have_posts() ) {
+
+				$the_query->the_post();
+
+				$post_id = get_the_ID();
+
+				$pub = get_post_meta( $post_id, '_pub', true );
+
+				$link = ( ! empty( $pub['url'] ) ) ? $pub['url'] : get_post_permalink();
+
+				ob_start();
+
+				include __DIR__ . '/displays/publication-item.php';
+
+				$html .= ob_get_clean();
+
+			} // End while
+
+			wp_reset_postdata();
+
+		} // end if
+
+		return $html;
+
+	} // End render_core_publications_shortcode
+
+
+	private function get_publications_shortcode_query( $atts ) {
+
+		$query_args = array(
+			'post_type'       => 'publications',
+			'posts_per_page'  => $atts['count'],
+		);
+
+		if ( ! empty( $atts['keywords'] ) ) {
+
+			$keywords = explode( ',', $atts['keywords'] );
+
+			if ( ! isset( $query_args['tax_query'] ) ) {
+
+				$query_args['tax_query'] = array();
+
+			} // End if
+
+			$query_args['tax_query'][] = array(
+				'taxonomy' => 'keywords',
+				'field'    => 'slug',
+				'terms'    => $keywords,
+			);
+
+		} // End if
+
+		if ( ! empty( $atts['featured_only'] ) ) {
+
+			if ( ! isset( $query_args['meta_query'] ) ) {
+
+				$query_args['meta_query'] = array();
+
+			} // End if
+
+			$query_args['meta_query'][] = array(
+				'key'     => '_pub',
+				'value'   => '"featured";s:3:"yes"',
+				'compare' => 'LIKE',
+			);
+
+		} // End if
+
+		if ( ! empty( $atts['exclude_featured'] ) ) {
+
+			if ( ! isset( $query_args['meta_query'] ) ) {
+
+				$query_args['meta_query'] = array();
+
+			} // End if
+
+			$query_args['meta_query'][] = array(
+				'key'     => '_pub',
+				'value'   => '"featured"',
+				'compare' => 'NOT LIKE',
+			);
+
+		} // End if
+
+		return $query_args;
+
+	} // End get_publications_shortcode_query
+
 
 	public function publication_url_redirect( $template ) {
 
@@ -243,7 +363,7 @@ class Publications_Module extends Core_Module {
 			'rewrite'           => array( 'slug' => 'keyword' ),
 		);
 
-		register_taxonomy( 'publication-keywords', array( 'publications' ), $keyword_args );
+		register_taxonomy( 'keywords', array( 'publications' ), $keyword_args );
 
 	} // end create_pubs_taxonomies
 
