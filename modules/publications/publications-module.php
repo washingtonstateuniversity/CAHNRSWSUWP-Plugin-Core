@@ -45,8 +45,8 @@ class Publications_Module extends Core_Module {
 	/**
 	 * Init the module here
 	 */
-	public function init() { 
-		
+	public function init() {
+
 		$this->register_post_type();
 		$this->create_pubs_taxonomies();
 
@@ -62,8 +62,9 @@ class Publications_Module extends Core_Module {
 
 	} // End init
 
-	function publication_url_redirect( $template ) {
-		if (is_singular ( 'publications' ) ) {
+	public function publication_url_redirect( $template ) {
+
+		if ( is_singular( 'publications' ) ) {
 
 			$post_id = get_the_ID();
 
@@ -71,60 +72,58 @@ class Publications_Module extends Core_Module {
 
 			$url_content = $publication['url'];
 
-			var_dump ($url_content);
-
-			if  ( ! empty( $url_content )) {
+			if ( ! empty( $url_content ) ) {
 				if ( wp_redirect( $url_content ) ) {
 					exit;
 				}
+			} // End if
+		}
 
-		   }
-		} 
 		return $template;
 	}
 
 	public function add_grant_meta_box() {
-        // Wp action for adding metabox.
-        add_meta_box(
-            'core_pub_info', // id
-            'Publication Information', // label
-            array( $this, 'the_pub_metabox' ) // callback to render content from metabox
-        );
+		// Wp action for adding metabox.
+		add_meta_box(
+			'core_pub_info', // id
+			'Publication Information', // label
+			array( $this, 'the_pub_metabox' ) // callback to render content from metabox
+		);
 	} // End add_grant_meta_box
 
 	public function the_pub_metabox( $post ) {
-        // Check if grants post type
-        if ( 'publications' === $post->post_type ) {
-            // Add nonce field to metabox.
+		// Check if grants post type
+		if ( 'publications' === $post->post_type ) {
+			// Add nonce field to metabox.
 			wp_nonce_field( 'save_pub_info', 'publication_info' );
-			
+
 			$publication = get_post_meta( $post->ID, '_pub', true );
 
-            $url_content = $publication['url']; // string HTML for publications.
-            $feature_content      = $publication['featured']; // string HTML for funding.
+			$url_content = $publication['url']; // string HTML for publications.
+			$feature_content      = $publication['featured']; // string HTML for funding.
 			$external_resources       = $publication['external']; // string HTML for impact.
-            include __DIR__ . '/displays/publications-meta-box.php';
-        } // End if
-    } // End if
-	
+			include __DIR__ . '/displays/publications-meta-box.php';
+		} // End if
+	} // End if
+
 	protected function register_post_type() {
 		$labels = array(
 			'name'               => _x( 'Publications', 'post type general name', 'cahnrswsuwp-plugin-core' ),
 			'singular_name'      => _x( 'Publication', 'post type singular name', 'cahnrswsuwp-plugin-core' ),
 			'menu_name'          => _x( 'Publications', 'admin menu', 'cahnrswsuwp-plugin-core' ),
 			'name_admin_bar'     => _x( 'Publication', 'add new on admin bar', 'cahnrswsuwp-plugin-core' ),
-			'add_new'            => __( 'Add New', 'publication', 'cahnrswsuwp-plugin-core' ),
+			'add_new'            => _x( 'Add New', 'publication', 'cahnrswsuwp-plugin-core' ),
 			'add_new_item'       => __( 'Add New Publication', 'cahnrswsuwp-plugin-core' ),
 			'new_item'           => __( 'New Publication', 'cahnrswsuwp-plugin-core' ),
 			'edit_item'          => __( 'Edit Publication', 'cahnrswsuwp-plugin-core' ),
-			'view_item'          => __( 'View Publication' , 'cahnrswsuwp-plugin-core' ),
+			'view_item'          => __( 'View Publication', 'cahnrswsuwp-plugin-core' ),
 			'all_items'          => __( 'All Publications', 'cahnrswsuwp-plugin-core' ),
 			'search_items'       => __( 'Search Publications', 'cahnrswsuwp-plugin-core' ),
 			'parent_item_colon'  => __( 'Parent Publication:', 'cahnrswsuwp-plugin-core' ),
 			'not_found'          => __( 'No publications found.', 'cahnrswsuwp-plugin-core' ),
 			'not_found_in_trash' => __( 'No publications found in Trash.', 'cahnrswsuwp-plugin-core' ),
 		);
-	
+
 		$args = array(
 			'labels'             => $labels,
 			'description'        => __( 'Description.', 'cahnrswsuwp-plugin-core' ),
@@ -137,9 +136,9 @@ class Publications_Module extends Core_Module {
 			'has_archive'        => true,
 			'hierarchical'       => false,
 			'menu_position'      => null,
-			'supports'           => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'comments' )
+			'supports'           => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'comments' ),
 		);
-	
+
 		register_post_type( 'publications', $args );
 	}  // End register_post_type
 
@@ -159,7 +158,7 @@ class Publications_Module extends Core_Module {
 			'new_item_name'     => __( 'New Author Name', 'cahnrswsuwp-plugin-core' ),
 			'menu_name'         => __( 'Author', 'cahnrswsuwp-plugin-core' ),
 		);
-	
+
 		$authors_args = array(
 			'hierarchical'      => true,
 			'labels'            => $authors_labels,
@@ -167,9 +166,9 @@ class Publications_Module extends Core_Module {
 			'show_admin_column' => true,
 			'query_var'         => true,
 		);
-	
-		register_taxonomy( 'publication-authors', array ( 'publications' ), $authors_args );
-	
+
+		register_taxonomy( 'publication-authors', array( 'publications' ), $authors_args );
+
 		//taxonomy=publication-program-areas
 		$program_areas_labels = array(
 			'name'              => _x( 'Program Areas', 'taxonomy general name', 'cahnrswsuwp-plugin-core' ),
@@ -184,7 +183,7 @@ class Publications_Module extends Core_Module {
 			'new_item_name'     => __( 'New Program Area Name', 'cahnrswsuwp-plugin-core' ),
 			'menu_name'         => __( 'Program Area', 'cahnrswsuwp-plugin-core' ),
 		);
-	
+
 		$program_areas_args = array(
 			'hierarchical'      => true,
 			'labels'            => $program_areas_labels,
@@ -192,13 +191,13 @@ class Publications_Module extends Core_Module {
 			'show_admin_column' => true,
 			'query_var'         => true,
 		);
-	
-		register_taxonomy( 'publication-program-areas', array ( 'publications' ), $program_areas_args );
-	
+
+		register_taxonomy( 'publication-program-areas', array( 'publications' ), $program_areas_args );
+
 		//taxonomy=publication-topics
 		$topic_labels = array(
 			'name'              => _x( 'Topics', 'taxonomy general name', 'cahnrswsuwp-plugin-core' ),
-			'singular_name'     => _x( 'Topic' , 'taxonomy singular name', 'cahnrswsuwp-plugin-core' ),
+			'singular_name'     => _x( 'Topic', 'taxonomy singular name', 'cahnrswsuwp-plugin-core' ),
 			'search_items'      => __( 'Search Topics', 'cahnrswsuwp-plugin-core' ),
 			'all_items'         => __( 'All Topics', 'cahnrswsuwp-plugin-core' ),
 			'parent_item'       => __( 'Parent Topic', 'cahnrswsuwp-plugin-core' ),
@@ -209,7 +208,7 @@ class Publications_Module extends Core_Module {
 			'new_item_name'     => __( 'New Topic Name', 'cahnrswsuwp-plugin-core' ),
 			'menu_name'         => __( 'Topic', 'cahnrswsuwp-plugin-core' ),
 		);
-	
+
 		$topics_args = array(
 			'hierarchical'      => true,
 			'labels'            => $topic_labels,
@@ -217,9 +216,9 @@ class Publications_Module extends Core_Module {
 			'show_admin_column' => true,
 			'query_var'         => true,
 		);
-	
-		register_taxonomy( 'publication-topics', array ( 'publications' ), $topics_args );
-	
+
+		register_taxonomy( 'publication-topics', array( 'publications' ), $topics_args );
+
 		//taxonomy=keywords
 		$keyword_labels = array(
 			'name'              => _x( 'Keywords', 'taxonomy general name', 'cahnrswsuwp-plugin-core' ),
@@ -228,13 +227,13 @@ class Publications_Module extends Core_Module {
 			'all_items'         => __( 'All Keywords', 'cahnrswsuwp-plugin-core' ),
 			'parent_item'       => __( 'Parent Keyword', 'cahnrswsuwp-plugin-core' ),
 			'parent_item_colon' => __( 'Parent Keyword:', 'cahnrswsuwp-plugin-core' ),
-			'edit_item'         => __( 'Edit Keyword' , 'cahnrswsuwp-plugin-core' ),
+			'edit_item'         => __( 'Edit Keyword', 'cahnrswsuwp-plugin-core' ),
 			'update_item'       => __( 'Update Keyword', 'cahnrswsuwp-plugin-core' ),
 			'add_new_item'      => __( 'Add New Keyword', 'cahnrswsuwp-plugin-core' ),
 			'new_item_name'     => __( 'New Keyword Name', 'cahnrswsuwp-plugin-core' ),
 			'menu_name'         => __( 'Keyword', 'cahnrswsuwp-plugin-core' ),
 		);
-	
+
 		$keyword_args = array(
 			'hierarchical'      => true,
 			'labels'            => $keyword_labels,
@@ -243,9 +242,9 @@ class Publications_Module extends Core_Module {
 			'query_var'         => true,
 			'rewrite'           => array( 'slug' => 'keyword' ),
 		);
-	
-		register_taxonomy( 'publication-keywords', array ( 'publications' ), $keyword_args );
-	
+
+		register_taxonomy( 'publication-keywords', array( 'publications' ), $keyword_args );
+
 	} // end create_pubs_taxonomies
 
 	// --------------- //
