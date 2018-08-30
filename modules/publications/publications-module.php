@@ -71,7 +71,7 @@ class Publications_Module extends Core_Module {
 			'keywords'         => '',
 			'title'            => '',
 			'title_tag'        => 'h2',
-			'count'            => '100',
+			'count'            => '20',
 			'featured_only'    => '',
 			'exclude_featured' => '',
 		);
