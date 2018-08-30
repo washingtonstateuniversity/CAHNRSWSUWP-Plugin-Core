@@ -82,6 +82,8 @@ class Core_Module {
 					} // End if
 				} // End foreach
 
+				require_once ccore_get_plugin_dir() . '/vendor/save-post/save-post.php';
+
 				$this->save_api = new \Save_Post_Data(
 					$save_settings,
 					$save_args['post_types'],
