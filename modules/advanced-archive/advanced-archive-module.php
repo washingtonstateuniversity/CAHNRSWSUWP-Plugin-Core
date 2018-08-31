@@ -47,9 +47,7 @@ class Advanced_Archive_Module extends Core_Module {
 	 */
 	public function init() {
 
-		add_action( 'core_archive_content_before', array( $this, 'add_archive_filter' ) );
-
-		
+		add_action( 'template_before_content', array( $this, 'add_archive_filter' ) );
 
 	} // End init
 
