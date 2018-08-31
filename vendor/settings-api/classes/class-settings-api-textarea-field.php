@@ -1,6 +1,6 @@
 <?php
 
-class Settings_API_Text_Field {
+class Settings_API_Textarea_Field {
 
 	public $id;
 
@@ -51,7 +51,7 @@ class Settings_API_Text_Field {
 
 		$id = $this->id;
 
-		include dirname( __DIR__ ) . '/displays/fields/text-field.php';
+		include dirname( __DIR__ ) . '/displays/fields/textarea-field.php';
 
 	} // End section_callback
 

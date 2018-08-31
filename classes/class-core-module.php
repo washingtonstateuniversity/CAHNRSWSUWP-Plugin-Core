@@ -32,21 +32,44 @@ class Core_Module {
 
 		add_action( 'init', array( $this, 'register_module' ) );
 
-		if ( ! empty( $this->register_args['settings_page'] ) ) {
+		if ( is_admin() ) {
 
-			add_action( 'admin_init', array( $this, 'add_admin_settings' ) );
+			if ( ! empty( $this->save_args ) ) {
 
-		} // End if
+				$this->do_save_post_module();
 
-		if ( is_admin() && ! empty( $this->save_args ) ) {
+			} // End if
 
-			$this->do_save_post_module();
+			if ( ! empty( $this->register_args['settings_page'] ) ) {
 
+				add_action( 'admin_init', array( $this, 'add_admin_settings' ) );
+
+			} // End if
+
+			if ( ! empty( $this->settings ) ) {
+
+				$this->fill_settings();
+
+			} // End if
 		} // End if
 
 		add_action( 'init', array( $this, 'init_module' ), $this->module_settings['init_priority'] );
 
 	} // End construct
+
+
+	protected function fill_settings() {
+
+		foreach ( $this->settings as $key => $setting ) {
+
+			if ( ! empty( $setting['sanitize_callback'] ) && is_array( $setting['sanitize_callback'] ) ) {
+
+				$this->settings[ $key ]['sanitize_callback'] = array_merge( array( $this ), $setting['sanitize_callback'] );
+
+			} // end if
+		} // End foreach
+
+	} // End fill_settings
 
 
 	protected function do_save_post_module() {

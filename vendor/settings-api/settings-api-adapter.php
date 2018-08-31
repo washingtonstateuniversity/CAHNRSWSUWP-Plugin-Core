@@ -9,6 +9,8 @@ class Settings_API_Adapter {
 
 		include_once 'classes/class-settings-api-text-field.php';
 
+		include_once 'classes/class-settings-api-textarea-field.php';
+
 		include_once 'classes/class-settings-api-select-field.php';
 
 		include_once 'classes/class-settings-api-checkbox-field.php';
@@ -54,18 +56,35 @@ class Settings_API_Adapter {
 	} // End add_section
 
 
-	public function add_text_field( $id, $label, $page, $section, $args = array(), $callback = false ) {
+	public function add_text_field( $id, $label, $page, $section, $value, $args = array(), $callback = false ) {
 
 		$field = new Settings_API_Text_Field(
 			$id,
 			$label,
 			$page,
 			$section,
+			$value,
 			$args,
 			$callback
 		);
 
 	}
+
+
+	public function add_textarea_field( $id, $label, $page, $section, $value, $args = array(), $callback = false ) {
+
+		$field = new Settings_API_Textarea_Field(
+			$id,
+			$label,
+			$page,
+			$section,
+			$value,
+			$args,
+			$callback
+		);
+
+	}
+
 
 	public function add_select_field( $id, $label, $page, $section, $options, $current_value, $args = array(), $callback = false ) {
 
