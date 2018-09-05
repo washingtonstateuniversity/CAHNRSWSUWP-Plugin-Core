@@ -43,7 +43,7 @@ class Modules {
 
 		include_once $plugin_base . '/modules/advanced-archive/advanced-archive-module.php';
 
-		include_once $plugin_base . '/modules/links/links-module.php';
+		//include_once $plugin_base . '/modules/links/links-module.php';
 
 	} // End add_modules
 

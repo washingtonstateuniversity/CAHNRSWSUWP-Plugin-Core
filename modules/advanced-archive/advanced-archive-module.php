@@ -52,9 +52,6 @@ class Advanced_Archive_Module extends Core_Module {
 	} // End init
 
 
-	
-
-
 	public function add_archive_filter() {
 
 		if ( is_post_type_archive() ) {
