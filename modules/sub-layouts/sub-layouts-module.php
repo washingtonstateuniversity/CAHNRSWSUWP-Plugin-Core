@@ -49,43 +49,7 @@ class Sub_Layouts_Module extends Core_Module {
 			'show_in_rest'      => false,
 			'default'           => '',
 		),
-		'core_sublayout_format_front_page' => array(
-			'type'              => 'string',
-			'description'       => 'Base layout to use on theme',
-			'show_in_rest'      => false,
-			'default'           => '',
-		),
-		'core_sublayout_format_post' => array(
-			'type'              => 'string',
-			'description'       => 'Base layout to use on theme',
-			'show_in_rest'      => false,
-			'default'           => '',
-		),
-		'core_sublayout_format_page' => array(
-			'type'              => 'string',
-			'description'       => 'Base layout to use on theme',
-			'show_in_rest'      => false,
-			'default'           => '',
-		),
 		'core_sublayout_menu' => array(
-			'type'              => 'string',
-			'description'       => 'Base layout to use on theme',
-			'show_in_rest'      => false,
-			'default'           => '',
-		),
-		'core_sublayout_menu_front_page' => array(
-			'type'              => 'string',
-			'description'       => 'Base layout to use on theme',
-			'show_in_rest'      => false,
-			'default'           => '',
-		),
-		'core_sublayout_menu_post' => array(
-			'type'              => 'string',
-			'description'       => 'Base layout to use on theme',
-			'show_in_rest'      => false,
-			'default'           => '',
-		),
-		'core_sublayout_menu_page' => array(
 			'type'              => 'string',
 			'description'       => 'Base layout to use on theme',
 			'show_in_rest'      => false,
@@ -230,27 +194,61 @@ class Sub_Layouts_Module extends Core_Module {
 
 		$layout = $this->get_layout();
 
-		$sidebar = 'sidebar';
+		if ( ! empty( $layout ) ) {
 
-		switch ( $layout ) {
+			$sidebar = $this->get_sidebar();
 
-			case 'left-column':
-				ob_start();
-				include __DIR__ . '/displays/left-column.php';
-				$html = ob_get_clean();
-				break;
+			switch ( $layout ) {
 
-			case 'right-column':
-				ob_start();
-				include __DIR__ . '/displays/right-column.php';
-				$html = ob_get_clean();
-				break;
+				case 'left-column':
+					ob_start();
+					include __DIR__ . '/displays/left-column.php';
+					$html = ob_get_clean();
+					break;
 
-		} // End switch
+				case 'right-column':
+					ob_start();
+					include __DIR__ . '/displays/right-column.php';
+					$html = ob_get_clean();
+					break;
+
+			} // End switch
+		} // End if
 
 		return $html;
 
 	} // End add_sublayout
+
+
+	protected function get_sidebar() {
+
+		$sidebar = '';
+
+		if ( is_singular() || is_post_type_archive() ) {
+
+			$post_type = get_post_type();
+
+			$sidebar = $this->get_sidebar_by_post_type( $post_type );
+
+		} // End if
+
+		return $sidebar;
+
+	} // End get_sidebar
+
+	protected function get_sidebar_by_post_type( $post_type ) {
+
+		$sidebar = '';
+
+		if ( ! empty( $post_type ) ) {
+
+			$sidebar = get_option( 'core_sublayout_sidebar_' . $post_type, '' );
+
+		} // End if
+
+		return $sidebar;
+
+	} // End get_sidebar_by_post_type
 
 
 	protected function get_menu_by_id( $post_id ) {
@@ -286,17 +284,7 @@ class Sub_Layouts_Module extends Core_Module {
 
 	protected function get_menu_by_post_type( $post_type ) {
 
-		$menu = false;
-
-		switch ( $post_type ) {
-
-			case 'page':
-				$menu = get_option( 'core_sublayout_menu_page' );
-				break;
-			case 'post':
-				$menu = get_option( 'core_sublayout_menu_post' );
-				break;
-		}
+		$menu = get_option( 'core_sublayout_menu_' . $post_type, '' );
 
 		return $menu;
 
@@ -327,6 +315,12 @@ class Sub_Layouts_Module extends Core_Module {
 				$menu = $this->get_menu_by_post_type( $post_type );
 
 			} // End if
+		} elseif ( is_post_type_archive() ) {
+
+			$post_type = get_post_type();
+
+			$menu = $this->get_menu_by_post_type( $post_type );
+
 		} // End if
 
 		if ( empty( $menu ) || 'default' === $menu ) {
@@ -375,15 +369,9 @@ class Sub_Layouts_Module extends Core_Module {
 
 		$sublayout = false;
 
-		switch ( $post_type ) {
+		$key = 'core_sublayout_format_' . $post_type;
 
-			case 'page':
-				$sublayout = get_option( 'core_sublayout_format_page' );
-				break;
-			case 'post':
-				$sublayout = get_option( 'core_sublayout_format_post' );
-				break;
-		}
+		$sublayout = get_option( $key, '' );
 
 		return $sublayout;
 
@@ -414,6 +402,12 @@ class Sub_Layouts_Module extends Core_Module {
 				$sublayout = $this->get_layout_by_post_type( $post_type );
 
 			} // End if
+		} elseif ( is_post_type_archive() ) {
+
+			$post_type = get_post_type();
+
+			$sublayout = $this->get_layout_by_post_type( $post_type );
+
 		} // End if
 
 		if ( empty( $sublayout ) || 'default' === $sublayout ) {
@@ -460,11 +454,45 @@ class Sub_Layouts_Module extends Core_Module {
 
 		$menu_options = $this->get_menu_terms();
 
+		$post_types = ccore_get_post_types_select();
+
+		$sidebars = ccore_get_registered_sidebars();
+
+		$post_types['front_page'] = 'Front Page';
+
+		$settings = $this->settings;
+
+		foreach ( $post_types as $slug => $label ) {
+
+			$settings[ 'core_sublayout_format_' . $slug ] = array(
+				'type'              => 'string',
+				'description'       => 'Base layout to use on theme',
+				'show_in_rest'      => false,
+				'default'           => '',
+			);
+
+			$settings[ 'core_sublayout_menu_' . $slug ] = array(
+				'type'              => 'string',
+				'description'       => 'Base layout to use on theme',
+				'show_in_rest'      => false,
+				'default'           => '',
+			);
+
+			$settings[ 'core_sublayout_sidebar_' . $slug ] = array(
+				'type'              => 'string',
+				'description'       => 'Base layout to use on theme',
+				'show_in_rest'      => false,
+				'default'           => '',
+			);
+
+		} // End foreach
+
+
 		// Register settings
 
 		$settings_adapter->register_settings(
 			$page_slug,
-			$this->settings
+			$settings
 		);
 
 		$settings_adapter->add_section(
@@ -492,59 +520,36 @@ class Sub_Layouts_Module extends Core_Module {
 			get_option( 'core_sublayout_menu' )
 		);
 
-		$settings_adapter->add_select_field(
-			'core_sublayout_format_front_page',
-			'Front Page Layout Format',
-			$page_slug,
-			$section,
-			$this->sub_layouts,
-			get_option( 'core_sublayout_format_front_page' )
-		);
+		foreach ( $post_types as $slug => $label ) {
 
-		$settings_adapter->add_select_field(
-			'core_sublayout_menu_front_page',
-			'Front Page Layout Menu',
-			$page_slug,
-			$section,
-			$menu_options,
-			get_option( 'core_sublayout_menu_front_page' )
-		);
+			$settings_adapter->add_select_field(
+				'core_sublayout_format_' . $slug,
+				$label . ' Layout Format',
+				$page_slug,
+				$section,
+				$this->sub_layouts,
+				get_option( 'core_sublayout_format_' . $slug, '' )
+			);
 
-		$settings_adapter->add_select_field(
-			'core_sublayout_format_page',
-			'Page Layout Format',
-			$page_slug,
-			$section,
-			$this->sub_layouts,
-			get_option( 'core_sublayout_format_page' )
-		);
+			$settings_adapter->add_select_field(
+				'core_sublayout_menu_' . $slug,
+				$label . ' Layout Menu',
+				$page_slug,
+				$section,
+				$menu_options,
+				get_option( 'core_sublayout_menu_' . $slug, '' )
+			);
 
-		$settings_adapter->add_select_field(
-			'core_sublayout_menu_page',
-			'Page Layout Menu',
-			$page_slug,
-			$section,
-			$menu_options,
-			get_option( 'core_sublayout_menu_page' )
-		);
+			$settings_adapter->add_select_field(
+				'core_sublayout_sidebar_' . $slug,
+				$label . ' Layout Sidebar',
+				$page_slug,
+				$section,
+				$sidebars,
+				get_option( 'core_sublayout_sidebar_' . $slug, '' )
+			);
 
-		$settings_adapter->add_select_field(
-			'core_sublayout_format_post',
-			'Post Layout Format',
-			$page_slug,
-			$section,
-			$this->sub_layouts,
-			get_option( 'core_sublayout_format_post' )
-		);
-
-		$settings_adapter->add_select_field(
-			'core_sublayout_menu_post',
-			'Post Layout Menu',
-			$page_slug,
-			$section,
-			$menu_options,
-			get_option( 'core_sublayout_menu_post' )
-		);
+		}
 
 		$settings_adapter->add_checkbox_field(
 			'core_sublayout_inherit',

@@ -18,7 +18,36 @@
 
 .core-layout-right-column .core-layout-column.lc-column-two {
     margin-right: 300px;
-} 
+}
+
+/*.core-layout-right-column {
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flexbox;
+    display: -o-flex;
+    display: flex;
+
+    -webkit-flex-direction: row;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -o-flex-direction: row;
+    flex-direction: row;
+
+    flex-wrap: nowrap;
+}
+
+.core-layout-right-column .core-layout-column.lc-column-one {
+    box-sizing: border-box;
+    margin: auto;  /* Magic! 
+    flex-grow
+}
+
+.core-layout-right-column .core-layout-column.lc-column-two {
+    width: 300px;
+    padding-left: 18px;
+    box-sizing: border-box;
+    margin: auto;  /* Magic! */
+}*/
 
 /* Left column layout */
 

@@ -75,7 +75,7 @@ function ccore_register_module( $slug, $args = array() ) {
 } // end ccore_register_module
 
 
-function ccore_get_registered_modules(){
+function ccore_get_registered_modules() {
 
 	global $ccore_modules;
 
@@ -105,3 +105,64 @@ function ccore_is_active_module( $slug ) {
 	return true;
 
 } // End ccore_is_active_module
+
+/**
+ * Get post types as slug => label
+ * @since 0.0.6
+ *
+ * @param array $exclude Post types to exclude
+ * @param bool $public Include only public post types
+ *
+ * @return array
+ */
+function ccore_get_post_types_select( $exclude = array(), $public = true ) {
+
+	$post_type_select = array();
+
+	$post_types = get_post_types(
+		array(
+			'public' => $public,
+		),
+		'objects'
+	);
+
+	foreach ( $post_types as $post_type ) {
+
+		$post_type_select[ $post_type->name ] = $post_type->label;
+
+	} // End foreach
+
+	return $post_type_select;
+
+} // End get_post_types_select
+
+/**
+ * Get post types as slug => label
+ * @since 0.0.6
+ *
+ * @param bool $as_select Return as ID => Name
+ *
+ * @return array
+ */
+function ccore_get_registered_sidebars( $as_select = true ) {
+
+	$sidebars = array();
+
+	global $wp_registered_sidebars;
+
+	if ( $as_select ) {
+
+		foreach ( $wp_registered_sidebars as $sidebar ) {
+
+			$sidebars[ $sidebar['id'] ] = $sidebar['name'];
+
+		} // end foreach
+	} else {
+
+		$sidebars = $wp_registered_sidebars;
+
+	} // End if
+
+	return $sidebars;
+
+} // End ccore_get_registered_sidebars
