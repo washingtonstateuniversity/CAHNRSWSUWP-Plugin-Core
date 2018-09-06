@@ -212,3 +212,34 @@ a.core-show-print {
 .core-advanced-archive-filter select {
     width: 90%;
 }
+
+/* -- Core Breadcrumbs ----------------------------------------------- */
+ul.breadcrumbs {
+    padding:18px 0 0!important;
+		font-size: .7em;
+		line-height:.5em;
+}
+.breadcrumbs li{
+	display:inline;
+	padding:0px 3px 0 0;
+}
+.breadcrumbs a:after {
+	font-family: FontAwesome;
+	content: ' \f101';
+		/* f0da, f105, f138 f101 */
+}
+.breadcrumbs li:last-child a {
+	color:#464e54;
+}
+.breadcrumbs li:last-child a:after {
+	content: none;
+}
+.breadcrumbs a {
+	text-decoration:none;
+}
+.breadcrumbs a:hover {
+	text-decoration:underline;
+}
+.breadcrumbs a:hover:after {
+	color:  #891e32;
+}
