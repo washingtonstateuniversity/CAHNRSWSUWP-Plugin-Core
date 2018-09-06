@@ -58,6 +58,8 @@ class Advanced_Archive_Module extends Core_Module {
 
 			$post_type = get_post_type();
 
+			var_dump( $post_type );
+
 			if ( $post_type ) {
 
 				$archive_options = get_option( 'core_archive_filters', array() );

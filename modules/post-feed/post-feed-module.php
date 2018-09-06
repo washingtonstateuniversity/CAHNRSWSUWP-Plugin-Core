@@ -23,17 +23,25 @@ class Post_Feed_Module extends Core_Module {
 	);
 
 	public $default_atts = array(
-		'post_type'      => 'post',
-		'post_status'    => 'publish',
-		'protocol'       => 'http',
-		'host'           => '',
-		'rest_path'      => '/wp-json/wp/v2/',
-		'per_page'       => -1,
-		'tags'           => '',
-		'categories'     => '',
-		'order_by'       => 'publish',
-		'order'          => 'DECS',
-		'page'           => 1,
+		'post_type'        => 'post',
+		'post_status'      => 'publish',
+		'protocol'         => 'http',
+		'host'             => '',
+		'rest_path'        => '/wp-json/wp/v2/',
+		'per_page'         => 10,
+		'tags'             => '',
+		'categories'       => '',
+		'order_by'         => 'publish',
+		'order'            => 'DECS',
+		'offset'           => 0,
+		'page'             => 1,
+		'filters'          => '',
+		'allow_pagination' => 1,
+		'show_search'      => '',
+		'display'          => 'promo',
+		'excerpt_length'   => 25,
+		'show_author'      => '',
+		'show_date'        => '',
 	);
 
 

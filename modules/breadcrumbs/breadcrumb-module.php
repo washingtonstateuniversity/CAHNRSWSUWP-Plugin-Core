@@ -27,23 +27,18 @@ class Breadcrumbs_Module extends Core_Module {
 	 */
 	public function init() {
 
-		add_action( 'init', array( $this, 'add_filters' ) );
+		add_action( 'theme_template_after_banner', array( $this, 'add_breadcrumb' ) );
 
 	} // End init
 
-	public function add_filters() {
 
-			add_filter( 'ignite_post_content_single_html', array( $this, 'add_breadcrumb' ), 1 );
-
-	} // End add_filters
-	
-	public function add_breadcrumb( $content ) {
+	public function add_breadcrumb() {
 
 		$breadcrumb_array = array(
-			array( 
+			array(
 				'title' => 'Home',
 				'link'  => get_home_url(),
-			)
+			),
 			// Home here so it always exits
 		);
 
@@ -55,7 +50,7 @@ class Breadcrumbs_Module extends Core_Module {
 
 			$breadcrumb_html = '<ul class="breadcrumbs">';
 
-		foreach( $breadcrumb_array as $crumb ) {
+		foreach ( $breadcrumb_array as $crumb ) {
 
 			$breadcrumb_html .= '<li><a href="' . $crumb['link'] . '">' . $crumb['title'] . '</a></li>';
 
@@ -63,11 +58,9 @@ class Breadcrumbs_Module extends Core_Module {
 
 		$breadcrumb_html .= '</ul>';
 
-		$content = $breadcrumb_html . $content; // Add breadcrumb_html to content
+		echo wp_kses_post( $breadcrumb_html );
 
-		remove_filter( 'the_content', array( $this, 'add_breadcrumb' ), 11 );
-
-		return $content;
+		remove_action( 'theme_template_after_banner', array( $this, 'add_breadcrumb' ) );
 
 	} // End add_breadcrumb
 
@@ -78,13 +71,13 @@ class Breadcrumbs_Module extends Core_Module {
 		$post_id = \get_the_ID();
 
 		$ancestors = get_post_ancestors( $post_id );
-		$ancestors = array_reverse($ancestors);
+		$ancestors = array_reverse( $ancestors );
 
 		foreach ( $ancestors as $ancestor ) {
-			$title = get_the_title($ancestor);
-			$link = get_permalink($ancestor);
-		
-			$temp = array( 
+			$title = get_the_title( $ancestor );
+			$link = get_permalink( $ancestor );
+
+			$temp = array(
 				'title' => $title,
 				'link'  => $link,
 			);
@@ -93,10 +86,10 @@ class Breadcrumbs_Module extends Core_Module {
 
 		} //End foreach
 
-		$title = get_the_title($post_id);
-		$link = get_permalink($post_id);
-		 
-		$temp = array( 
+		$title = get_the_title( $post_id );
+		$link = get_permalink( $post_id );
+
+		$temp = array(
 			'title' => $title,
 			'link'  => $link,
 		);
@@ -109,4 +102,4 @@ class Breadcrumbs_Module extends Core_Module {
 
 } // End Sub_Layouts
 
-$ccore_Breadcrumbs_Module = new Breadcrumbs_Module(); // Edit This
+$ccore_breadcrumbs_module = new Breadcrumbs_Module(); // Edit This
