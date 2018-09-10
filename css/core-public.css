@@ -1,3 +1,206 @@
+/**
+* CAHNRS Core
+* @author Danial Bleile, Lesa McPeak
+* @version 0.0.1
+*/
+
+/**
+* DOCUMENT INDEX
+* - Module: Post Feed
+* -- Search
+* -- Filters
+* -- Pagination
+* -- Items
+*/
+
+/* ============================ Module: Post Feed ============================ */
+
+/* == Search == */
+.core-post-feed .core-post-feed-search {
+    padding-bottom: 18px;
+}
+
+.core-post-feed .core-post-feed-search input {
+    height: 40px;
+    line-height: 40px;
+    width: 200px;
+    text-indent: 8px;
+    font-size: 16px;
+    border: 1px solid #981e32;
+    vertical-align: top;
+    display: inline-block;
+}
+
+.core-post-feed .core-post-feed-search button {
+    height: 40px;
+    width: 60px;
+    font-size: 16px;
+    background-color: #981e32;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 0;
+    border: 1px solid #981e32;
+    outline: none;
+    vertical-align: top;
+    display: inline-block;
+}
+
+/* == Filters == */
+.core-post-feed .core-post-feed-filters .core-post-feed-filter {
+    display: inline-block;
+    width: 200px;
+    vertical-align: top;
+    margin-bottom: 18px;
+    box-sizing: border-box;
+    margin-right: 18px;
+}
+.core-post-feed .core-post-feed-filters .core-post-feed-filter .select-filter {
+    overflow: hidden;
+    position: relative;
+}
+
+.core-post-feed .core-post-feed-filters .core-post-feed-filter label {
+    display: block;
+    text-transform: uppercase;
+}
+
+.core-post-feed .core-post-feed-filters .core-post-feed-filter .select-filter select {
+    display: block;
+    width: 220px;
+    height: 30px;
+    line-height: 30px;
+    border: 1px solid #981e32;
+    position: relative;
+    z-index: 2;
+    background: none;
+    cursor: pointer;
+}
+
+.core-post-feed .core-post-feed-filters .core-post-feed-filter .select-filter:after {
+    width: 30px; 
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    position: absolute;
+    display: block;
+    top: 0;
+    right: 0;
+    background-color: #981e32;
+    content: "\f0d7";
+    font-family: fontAwesome;
+    color: #fff;
+    z-index: 98;
+    cursor: pointer;
+    z-index: 1;
+}
+
+/* == Pagnination == */
+
+.core-post-feed .core-post-feed-pagination {
+    text-align: right;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+}
+
+.core-post-feed .core-post-feed-pagination.pagination-after {
+    text-align: right;
+    border-bottom: none;
+    border-top: 1px solid #ccc;
+    padding-top: 12px;
+}
+
+.core-post-feed .core-post-feed-pagination .core-post-feed-pagination-summary {
+    display: inline-block;
+    vertical-align: top;
+    height: 40px;
+    line-height: 40px;
+    margin-right: 18px;
+    font-size: 14px;
+}
+
+.core-post-feed .core-post-feed-pagination .core-post-feed-pagination-nav {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.core-post-feed .core-post-feed-pagination .core-post-feed-pagination-nav button {
+    height: 40px;
+    background-color: #981e32;
+    border-radius: 0;
+    color: #fff;
+    outline: none;
+    border: none;
+    text-transform: uppercase;
+    padding-left: 18px;
+    padding-right: 18px;
+}
+
+/* == Items == */
+
+.core-post-feed .core-post-feed-items {
+    margin-bottom: 18px;
+}
+
+.core-post-feed .core-post-feed-items .core-post-feed-item {
+    position: relative;
+    padding: 12px;
+    overflow: hidden;
+}
+
+.core-post-feed .core-post-feed-items .core-post-feed-item {
+    position: relative;
+    padding: 8px;
+}
+.core-post-feed .core-post-feed-items .core-post-feed-item:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.core-post-feed .core-post-feed-items .core-post-feed-item .item-image {
+    height: 175px;
+    overflow: hidden;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.core-post-feed .core-post-feed-items .core-post-feed-item .item-image-wrapper {
+    width: 175px;
+    float: left;
+}
+
+.core-post-feed .core-post-feed-items .core-post-feed-item .item-caption-wrapper {
+    box-sizing: border-box;
+}
+
+.core-post-feed .core-post-feed-items .core-post-feed-item.has-image .item-caption-wrapper {
+    margin-left: 175px;
+    padding-left: 16px;
+}
+
+.core-post-feed .core-post-feed-items .core-post-feed-item .item-title {
+    color: #981e32;
+}
+
+.core-post-feed .core-post-feed-items .core-post-feed-item .item-excerpt {
+    font-size: 16px;
+}
+
+.core-post-feed .core-post-feed-items .core-post-feed-item .item-link a {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: block;
+    font-size: 0;
+    top: 0;
+    left: 0;
+}
+
+.core-post-feed .core-post-feed-items .core-post-feed-item .item-link a:hover {
+    background-color: rgba(0,0,0,0.1);
+}
 /* -- Core Sub Layouts ----------------------------------------------- */
 
 .core-sublayout-wrapper:after {

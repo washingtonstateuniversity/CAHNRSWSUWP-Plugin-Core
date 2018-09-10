@@ -45,6 +45,8 @@ class Modules {
 
 		include_once $plugin_base . '/modules/breadcrumbs/breadcrumb-module.php';
 
+		include_once $plugin_base . '/modules/post-feed/post-feed-module.php';
+
 		//include_once $plugin_base . '/modules/links/links-module.php';
 
 	} // End add_modules
