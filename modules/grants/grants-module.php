@@ -48,20 +48,20 @@ class Grants_Module extends Core_Module {
 	// @var array $save_args Passed to the Save_Post_API
 	protected $save_args = array(
 		'post_types'             => array( 'grants' ), // Post types to do save on
-		'nonce_name'             => 'core_grants_module', // Nonce name used on the metabox or edit form 
-		'nonce_action'           => 'core_grants_module_save_post', // Nonce action used on the metabox or edit form 
+		'nonce_name'             => 'core_grants_module', // Nonce name used on the metabox or edit form
+		'nonce_action'           => 'core_grants_module_save_post', // Nonce action used on the metabox or edit form
 		'save_setting_callback'  => 'save_grant_setting', // Custom callback for editing data before save
 		'add_actions'            => true, // Add save actions. Set to false if you want to add actions manually
 	);
 
-	// @var $post_settings Settings for the Save_Post_API to use. 
+	// @var $post_settings Settings for the Save_Post_API to use.
 	protected $post_settings = array(
 		'_grant' => array( // Settings key
 			'sanitize_type'      => 'custom', // Type of data - used to sanitize the data
 			'default'            => '', // Default value
-			'check_isset'        => true, // Do a check if isset, otherwise will use default value 
+			'check_isset'        => true, // Do a check if isset, otherwise will use default value
 			'ignore_empty'       => true, // Ignore if data is an empty string
-			'sanitize_callback'  => 'sanitize_grants_post_meta', // Custom sanitization callback 
+			'sanitize_callback'  => 'sanitize_grants_post_meta', // Custom sanitization callback
 		),
 	);
 
@@ -93,11 +93,63 @@ class Grants_Module extends Core_Module {
 
 		} // End if
 
+		add_filter( 'core_grants_legacy_meta', array( $this, 'add_legacy_support' ), 10, 2 );
+
+		add_filter( 'the_content', array( $this, 'add_grant_meta_content'), 2 );
+
 	} // End init
 
 
+	public function add_legacy_support( $grants_array, $post ) {
+
+		// Get the grants meta data - stored as an array under a single key.
+		$grants_meta = get_post_meta( $post->ID, '_grant', true );
+
+		if ( empty( $grants_array['publications_content'] ) && ! empty( $grants_meta['publications'] ) ) {
+
+			$grants_array['publications_content'] = $grants_meta['publications'];
+
+		} // End if
+
+		if ( empty( $grants_array['funding_content'] ) && ! empty( $grants_meta['additional_funds'] ) ) {
+
+			$grants_array['funding_content'] = $grants_meta['additional_funds'];
+
+		} // End if
+
+		if ( empty( $grants_array['impact_content'] ) && ! empty( $grants_meta['impacts'] ) ) {
+
+			$grants_array['impact_content'] = $grants_meta['impacts'];
+
+		} // End if
+
+		if ( empty( $grants_array['admin_content'] ) && ! empty( $grants_meta['admin_comments'] ) ) {
+
+			$grants_array['admin_content'] = $grants_meta['admin_comments'];
+
+		} // End if
+
+		if ( empty( $grants_array['additional_funding'][0]['amount'] ) && ! empty( $grants_meta['csanr_funds'] ) ) {
+
+			$grants_array['additional_funding'][0]['label'] = 'CSANR Funds';
+			$grants_array['additional_funding'][0]['amount'] = $grants_meta['csanr_funds'];
+
+		} // End if
+
+		if ( empty( $grants_array['additional_funding'][1]['amount'] ) && ! empty( $grants_meta['arc_funds'] ) ) {
+
+			$grants_array['additional_funding'][1]['label'] = 'ARC Funds';
+			$grants_array['additional_funding'][1]['amount'] = $grants_meta['arc_funds'];
+
+		} // End if
+
+		return $grants_array;
+
+	}
+
+
 	/**
-	 * Sanitize the post data before saving. This is a custom callback passed in the 'sanitize_callback' of the setting. 
+	 * Sanitize the post data before saving. This is a custom callback passed in the 'sanitize_callback' of the setting.
 	 * @since 0.0.1
 	 */
 	public function sanitize_grants_post_meta( $key, $sent_value ) {
@@ -123,6 +175,122 @@ class Grants_Module extends Core_Module {
 		add_action( 'add_meta_boxes', array( $this, 'add_grant_meta_box' ) );
 
 	} // End init_metabox
+
+
+	public function add_grant_meta_content( $content ) {
+
+		if ( is_singular( 'grants' ) ) {
+
+			$post_id = get_the_ID();
+
+			$post = get_post( $post_id );
+
+			// Get the grants meta data - stored as an array under a single key.
+			$grants_meta = get_post_meta( $post->ID, '_grant', true );
+
+			$grants_array = array(
+				'publications_content' => get_post_meta( $post->ID, '_grant_publications_content', true ), // string HTML for publications.
+				'funding_content'      => get_post_meta( $post->ID, '_grant_funding_content', true ), // string HTML for funding.
+				'impact_content'       => get_post_meta( $post->ID, '_grant_impact_content', true ), // string HTML for impact.
+				'admin_content'        => get_post_meta( $post->ID, '_grant_admin_content', true ), // string HTML for admin.
+				'project_id'           => ( ! empty( $grants_meta['project_id'] ) ) ? $grants_meta['project_id'] : '', // string Project ID
+				'status'               => $this->get_grant_status( $post->ID ),
+				'investigators'        => $this->get_investigators_terms(), // array Term_ID => Term Name Investigators taxonomy terms.
+				'annual_entries'       => $this->get_annual_entries( $post ), // array Annual entries array.
+				'additional_funding'   => $this->get_additional_funds( $post ), // array Additional funds array.
+			);
+
+
+			$grants_array = apply_filters( 'core_grants_legacy_meta', $grants_array, $post );
+
+			$status               = $grants_array['status'];
+			$publications_content = $grants_array['publications_content'];
+			$funding_content      = $grants_array['funding_content'];
+			$impact_content       = $grants_array['impact_content'];
+			$admin_content        = $grants_array['admin_content'];
+			$project_id           = $grants_array['project_id'];
+			$investigators        = $grants_array['investigators'];
+			$annual_entries       = $grants_array['annual_entries'];
+			$additional_funding   = $grants_array['additional_funding'];
+
+			ob_start();
+
+			echo '<div class="core-grant-content">';
+
+			include __DIR__ . '/displays/grant-meta-content.php';
+
+			foreach( $annual_entries as $entry ) {
+
+				if ( ! empty( $entry['year'] ) ) {
+
+					$year                       = ( ! empty( $entry['year'] ) ) ? $entry['year'] : '';
+					$progress_report_url        = ( ! empty( $entry['progress'] ) ) ? $entry['progress'] : '';
+					$additional_progress_report = ( ! empty( $entry['additional_progress'] ) ) ? $entry['additional_progress'] : '';
+					$grant_amount               = ( ! empty( $entry['amount'] ) ) ? $entry['amount'] : '';
+					$pi                         = ( ! empty( $entry['pi'] ) ) ? $this->get_investigators( $entry['pi'] ) : array();
+					$additional_investigators   = ( ! empty( $entry['additional'] ) ) ? $this->get_investigators( $entry['additional'] ) : array();
+					$students                   = ( ! empty( $entry['students'] ) ) ? $this->get_investigators( $entry['students'] ) : array();
+
+					include __DIR__ . '/displays/grant-annual-entry-content.php';
+
+				} // End if
+
+			} // End foreach
+
+			include __DIR__ . '/displays/grant-content.php';
+
+			echo '</div>';
+
+			$content .= ob_get_clean();
+
+		} // End if
+
+		return $content;
+
+	} // End add_grant_meta_content
+
+
+	private function get_grant_status( $post_id ) {
+
+		$status = array();
+
+		$status_terms = wp_get_post_terms( $post_id, 'status' );
+
+		if ( is_array( $status_terms ) ) {
+
+			foreach ( $status_terms as $term ) {
+
+				$status[] = $term->name;
+
+			} // End foreach
+		} // End if
+
+		return implode( ', ', $status );
+
+	} // End get_grant_status
+
+
+	private function get_investigators( $term_ids ) {
+
+		$investigators = array();
+
+		if ( is_array( $term_ids ) ) {
+
+			foreach ( $term_ids as $term_id ) {
+
+				$term = get_term( $term_id, 'investigators' );
+
+				if ( $term ) {
+
+					$investigators[] = $term->name;
+
+				} // End if
+			} // End foreach
+		} // End if
+
+		return $investigators;
+
+	} // End get_investigators
 
 
 	/**
@@ -165,14 +333,27 @@ class Grants_Module extends Core_Module {
 			// Add nonce field to metabox.
 			wp_nonce_field( 'core_grants_module_save_post', 'core_grants_module' );
 
-			$publications_content = ''; // string HTML for publications.
-			$funding_content      = ''; // string HTML for funding.
-			$impact_content       = ''; // string HTML for impact.
-			$admin_content        = ''; // string HTML for admin.
-			$project_id           = ''; // string Project ID
-			$investigators        = $this->get_investigators_terms(); // array Term_ID => Term Name Investigators taxonomy terms.
-			$annual_entries       = $this->get_annual_entries( $post ); // array Annual entries array.
-			$additional_funds     = $this->get_additional_funds( $post ); // array Additional funds array.
+			$grants_array = array(
+				'publications_content' => get_post_meta( $post->ID, '_grant_publications_content', true ), // string HTML for publications.
+				'funding_content'      => get_post_meta( $post->ID, '_grant_funding_content', true ), // string HTML for funding.
+				'impact_content'       => get_post_meta( $post->ID, '_grant_impact_content', true ), // string HTML for impact.
+				'admin_content'        => get_post_meta( $post->ID, '_grant_admin_content', true ), // string HTML for admin.
+				'project_id'           => ( ! empty( $grants_meta['project_id'] ) ) ? $grants_meta['project_id'] : '', // string Project ID
+				'investigators'        => $this->get_investigators_terms(), // array Term_ID => Term Name Investigators taxonomy terms.
+				'annual_entries'       => $this->get_annual_entries( $post ), // array Annual entries array.
+				'additional_funding'   => $this->get_additional_funds( $post ), // array Additional funds array.
+			);
+
+			$grants_array = apply_filters( 'core_grants_legacy_meta', $grants_array, $post );
+
+			$publications_content = $grants_array['publications_content'];
+			$funding_content      = $grants_array['funding_content'];
+			$impact_content       = $grants_array['impact_content'];
+			$admin_content        = $grants_array['admin_content'];
+			$project_id           = $grants_array['project_id'];
+			$investigators        = $grants_array['investigators'];
+			$annual_entries       = $grants_array['annual_entries'];
+			$additional_funding   = $grants_array['additional_funding'];
 
 			// Get the content to display.
 			include __DIR__ . '/displays/grants-meta-box.php';
@@ -243,10 +424,10 @@ class Grants_Module extends Core_Module {
 
 		// Check if the value is array, will return empty string if not set.
 		// Check if additional funds has a value.
-		if ( is_array( $grants_meta ) && ! empty( $grants_meta['additional_funds'] ) ) {
+		if ( is_array( $grants_meta ) && ! empty( $grants_meta['additional_funding'] ) ) {
 
 			// Set this to a var - somewhat redundant to below.
-			$funds_meta = $grants_meta['additional_funds'];
+			$funds_meta = $grants_meta['additional_funding'];
 
 			// Loop through set funds.
 			foreach ( $funds_meta as $index => $fund ) {

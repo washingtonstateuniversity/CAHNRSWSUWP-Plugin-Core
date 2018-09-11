@@ -37,6 +37,7 @@ class Post_Feed_Module extends Core_Module {
 		'offset'                 => 0,
 		'page'                   => 1,
 		'taxonomy_filters'       => '',
+		'built_in_filters'       => '',
 		'show_pagination'        => '',
 		'show_search'            => '',
 		'display'                => 'promo',
@@ -50,6 +51,7 @@ class Post_Feed_Module extends Core_Module {
 		'title_tag'              => 'h3',
 		'css_hook'               => '',
 		'show_image_placeholder' => '',
+		'year'                   => '',
 	);
 
 
@@ -117,7 +119,7 @@ class Post_Feed_Module extends Core_Module {
 
 	private function the_filters( $atts ) {
 
-		if ( ! empty( $atts['taxonomy_filters'] ) || ! empty( $atts['meta_filters'] ) ) {
+		if ( ! empty( $atts['taxonomy_filters'] ) || ! empty( $atts['meta_filters'] ) || ! empty( $atts['built_in_filters'] ) ) {
 
 			$filters_array = $this->get_filters_array( $atts );
 
@@ -224,6 +226,12 @@ class Post_Feed_Module extends Core_Module {
 		if ( ! empty( $_REQUEST['pf_search'] ) ) {
 
 			$atts['s'] = sanitize_text_field( $_REQUEST['pf_search'] );
+
+		} // End if
+
+		if ( ! empty( $_REQUEST['pf_year'] ) ) {
+
+			$atts['year'] = sanitize_text_field( $_REQUEST['pf_year'] );
 
 		} // End if
 
@@ -380,11 +388,14 @@ class Post_Feed_Module extends Core_Module {
 					$terms = ( ! empty( $filter_group[2] ) ) ? explode( ',', $filter_group[2] ) : array();
 
 					$filter_array = array(
+						'type'           => 'taxonomy',
+						'name'           => 'taxonomies[' . $taxonomy . ']',
 						'taxonomy'       => $taxonomy,
+						'class'          => $taxonomy,
 						'label'          => ( ! empty( $filter_group[1] ) ) ? $filter_group[1] : 'Filter By:',
 						'terms'          => $terms,
 						'current_value'  => '',
-						'term_options'   => $this->get_filter_term_options( $taxonomy, $terms ),
+						'options'   => $this->get_filter_term_options( $taxonomy, $terms ),
 					);
 
 					if ( isset( $_REQUEST['taxonomies'][ $taxonomy ] ) && ! empty( $_REQUEST['taxonomies'][ $taxonomy ] ) ) {
@@ -399,9 +410,70 @@ class Post_Feed_Module extends Core_Module {
 			} // End foreach
 		} // End if
 
+		if ( ! empty( $atts['built_in_filters'] ) ) {
+
+			$defined_filters = $this->get_built_in_filters( $atts['built_in_filters'], $atts );
+
+			if ( ! empty( $defined_filters ) ) {
+
+				$filters_array = array_merge( $filters_array, $defined_filters );
+
+			} // End if
+		} // End if
+
 		return $filters_array;
 
 	} // End get_filters_html
+
+
+	private function get_built_in_filters( $defined_filters, $atts ) {
+
+		$filters = array();
+
+		$defined_filters = explode( ',', $defined_filters );
+
+		foreach ( $defined_filters as $filter ) {
+
+			switch ( $filter ) {
+
+				case 'year':
+					$filters[] = $this->get_year_filter( $atts );
+					break;
+
+			} // End switch
+		} // End foreach
+
+		return $filters;
+
+	} // End get_defined_filters
+
+
+	private function get_year_filter( $atts ) {
+
+		$years = array();
+
+		$current_year = date( 'Y' );
+
+		for ( $y = 0; $y < 50; $y++ ) {
+
+			$year = $current_year - $y;
+
+			$years[ $year ] = $year;
+
+		} // End for
+
+		$filter = array(
+			'type'          => 'built-in',
+			'name'          => 'pf_year',
+			'label'         => 'Year',
+			'options'       => $years,
+			'current_value' => ( ! empty( $atts['year'] ) ) ? $atts['year'] : '',
+			'class'         => 'pf_year',
+		);
+
+		return $filter;
+
+	} // End get_year_filter
 
 
 	private function get_filter_term_options( $taxonomy, $term_ids ) {
@@ -619,6 +691,12 @@ class Post_Feed_Module extends Core_Module {
 		if ( ! empty( $atts['s'] ) ) {
 
 			$query_args['s'] = $atts['s'];
+
+		} // End if
+
+		if ( ! empty( $atts['year'] ) ) {
+
+			$query_args['year'] = $atts['year'];
 
 		} // End if
 

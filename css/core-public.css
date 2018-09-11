@@ -11,6 +11,7 @@
 * -- Filters
 * -- Pagination
 * -- Items
+* -- Grants
 */
 
 /* ============================ Module: Post Feed ============================ */
@@ -48,7 +49,7 @@
 /* == Filters == */
 .core-post-feed .core-post-feed-filters .core-post-feed-filter {
     display: inline-block;
-    width: 200px;
+    width: 195px;
     vertical-align: top;
     margin-bottom: 18px;
     box-sizing: border-box;
@@ -66,17 +67,14 @@
 
 .core-post-feed .core-post-feed-filters .core-post-feed-filter .select-filter select {
     display: block;
-    width: 220px;
+    width: 100%;
     height: 30px;
     line-height: 30px;
     border: 1px solid #981e32;
-    position: relative;
-    z-index: 2;
-    background: none;
     cursor: pointer;
 }
 
-.core-post-feed .core-post-feed-filters .core-post-feed-filter .select-filter:after {
+/*.core-post-feed .core-post-feed-filters .core-post-feed-filter .select-filter:after {
     width: 30px; 
     height: 30px;
     line-height: 30px;
@@ -91,8 +89,8 @@
     color: #fff;
     z-index: 98;
     cursor: pointer;
-    z-index: 1;
-}
+    z-index: 2;
+}*/
 
 /* == Pagnination == */
 
@@ -203,6 +201,18 @@
 }
 /* -- Core Sub Layouts ----------------------------------------------- */
 
+.core-sublayout-wrapper {
+    display:table;
+}
+
+.core-sublayout-inner {
+    display:table-row;
+}
+
+.core-layout-column {
+    display:table-cell;
+}
+
 .core-sublayout-wrapper:after {
     content: "";
     clear: both;
@@ -210,18 +220,20 @@
 
 }
 
-/* Right column layout */
-
-.core-layout-right-column .core-layout-column.lc-column-one {
-    float: right;
+.core-layout-right-column .core-layout-column.lc-column-two {
     width: 300px;
     box-sizing: border-box;
-    padding-left: 18px;
+    padding-left: 14px;
 }
 
-.core-layout-right-column .core-layout-column.lc-column-two {
-    margin-right: 300px;
+.core-layout-right-column .core-layout-column.lc-column-one {
+    padding-right: 14px;
 }
+
+
+/*.core-layout-right-column .core-layout-column.lc-column-two {
+    margin-right: 300px;
+}*/
 
 /*.core-layout-right-column {
     display: -webkit-flex;
@@ -285,6 +297,11 @@
 
 @media screen and (max-width: 989px) {
 
+    .core-sublayout-inner,
+    .core-sublayout-wrapper {
+        display:block;
+    }
+
     .core-layout-right-column .core-layout-column.lc-column-one,
     .core-layout-left-column .core-layout-column.lc-column-one {
         float: none;
@@ -292,12 +309,17 @@
         box-sizing: border-box;
         padding-right: 0;
         padding-left: 0;
+        display: block;
     }
 
     .core-layout-right-column .core-layout-column.lc-column-two,
     .core-layout-left-column .core-layout-column.lc-column-two {
         margin-right: 0;
         margin-left: 0;
+        padding-right: 0;
+        padding-left: 0;
+        width: auto;
+        display: block;
     }
     
 }
@@ -445,4 +467,18 @@ ul.breadcrumbs {
 }
 .breadcrumbs a:hover:after {
 	color:  #891e32;
+}
+
+/* ============================ Module: Grants ============================ */
+
+.core-grant-content .grant-meta {
+    border-bottom: 1px solid #ddd;
+}
+
+.core-grant-content .grant-annual-entry {
+    margin: 16px 0;
+}
+
+.core-grant-content .grant-label {
+    font-weight: bold;
 }

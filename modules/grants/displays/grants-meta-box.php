@@ -66,14 +66,14 @@
 	<fieldset>
 		<p class="core-fieldset-title">Additional Funds</p>
 		<div class="core-form-content">
-			<?php foreach ( $additional_funds as $index => $fund ) : ?>
+			<?php foreach ( $additional_funding as $index => $fund ) : ?>
 			<div class="core-field core-text-field">
 				<label>Fund Name</label>
-				<input type="text" name="_grant[additional_funds][<?php echo esc_attr( $index ); ?>][label]" value="<?php echo esc_attr( $fund['label'] ); ?>">
+				<input type="text" name="_grant[additional_funding][<?php echo esc_attr( $index ); ?>][label]" value="<?php echo esc_attr( $fund['label'] ); ?>">
 			</div>
 			<div class="core-field core-text-field">
 				<label>Fund Amount</label>
-				$<input type="text" name="_grant[additional_funds][<?php echo esc_attr( $index ); ?>][amount]" value="<?php echo esc_attr( $fund['amount']  ); ?>">
+				$<input type="text" name="_grant[additional_funding][<?php echo esc_attr( $index ); ?>][amount]" value="<?php echo esc_attr( $fund['amount']  ); ?>">
 			</div>
 			<?php endforeach; ?>
 		</div>
