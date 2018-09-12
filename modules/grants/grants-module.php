@@ -95,9 +95,84 @@ class Grants_Module extends Core_Module {
 
 		add_filter( 'core_grants_legacy_meta', array( $this, 'add_legacy_support' ), 10, 2 );
 
-		add_filter( 'the_content', array( $this, 'add_grant_meta_content'), 2 );
+		add_filter( 'the_content', array( $this, 'add_grant_meta_content' ), 2 );
+
+		add_filter( 'core_post_feed_items_html', array( $this, 'add_grant_list_display' ), 10, 3 );
+
+		add_filter( 'core_post_feed_local_item_array', array( $this, 'add_grant_item_values' ), 10, 3 );
 
 	} // End init
+
+
+	public function add_grant_item_values( $item, $post_id, $atts ) {
+
+		if ( 'grants' === $item['post_type'] ) {
+
+			$post = get_post( $post_id );
+
+			// Get the grants meta data - stored as an array under a single key.
+			$grants_meta = get_post_meta( $post->ID, '_grant', true );
+
+			$grants_array = array(
+				'project_id'           => ( ! empty( $grants_meta['project_id'] ) ) ? $grants_meta['project_id'] : '', // string Project ID
+				'annual_entries'       => $this->get_annual_entries( $post ), // array Annual entries array.
+			);
+
+			$item['project_id']    = $grants_array['project_id'];
+			$item['pi']            = array();
+
+			if ( is_array( $grants_array['annual_entries'] ) && ! empty( $grants_array['annual_entries'] ) ) {
+
+				foreach ( $grants_array['annual_entries'] as $entry ) {
+
+					if ( ! empty( $entry['year'] ) && ! empty( $entry['pi'] ) ) {
+
+						$investigators = $this->get_investigators( $entry['pi'] );
+
+						foreach ( $investigators as $id => $name ) {
+
+							if ( ! in_array( $name, $item['pi'], true ) ) {
+
+								$item['pi'][] = $name;
+
+							} // End if
+						} // End foreach
+					} // End if
+				} // End foreach
+			} // End if
+		} // End if
+
+		return $item;
+
+	} // End add_grant_item_values
+
+
+	public function add_grant_list_display( $html, $items, $atts ) {
+
+		if ( ! empty( $atts['display'] ) && 'grant-list' === $atts['display'] ) {
+
+			ob_start();
+
+			foreach ( $items as $item ) {
+
+				//var_dump( $item );
+				$title_tag  = ( ! empty( $atts['title_tag'] ) ) ? $atts['title_tag'] : 'h3';
+				$project_id = ( ! empty( $item['project_id'] ) ) ? $item['project_id'] : '';
+				$title      = ( ! empty( $item['title'] ) ) ? $item['title'] : '';
+				$link       = ( ! empty( $item['link'] ) ) ? $item['link'] : '';
+				$pi         = ( ! empty( $item['pi'] ) ) ? implode( ', ', $item['pi'] ) : '';
+
+				include __DIR__ . '/displays/grant-list.php';
+
+			} // End foreach
+
+			$html .= ob_get_clean();
+
+		} // End if
+
+		return $html;
+
+	} // End add_grant_list_display
 
 
 	public function add_legacy_support( $grants_array, $post ) {

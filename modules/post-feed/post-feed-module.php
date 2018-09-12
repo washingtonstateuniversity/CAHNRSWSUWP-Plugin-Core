@@ -52,6 +52,7 @@ class Post_Feed_Module extends Core_Module {
 		'css_hook'               => '',
 		'show_image_placeholder' => '',
 		'year'                   => '',
+		'author'                 => '',
 	);
 
 
@@ -241,6 +242,12 @@ class Post_Feed_Module extends Core_Module {
 
 		} // End if
 
+		if ( ! empty( $_REQUEST['pf_author'] ) ) {
+
+			$atts['author'] = sanitize_text_field( $_REQUEST['pf_author'] );
+
+		} // End if
+
 		if ( ! empty( $_REQUEST['taxonomies'] ) ) {
 
 			if ( empty( $atts['taxonomies'] ) || ! is_array( $atts['taxonomies'] ) ) {
@@ -319,6 +326,7 @@ class Post_Feed_Module extends Core_Module {
 				$post_id = get_the_ID();
 
 				$item = array(
+					'post_type' => get_post_type(),
 					'title'     => get_the_title(),
 					'author'    => get_the_author_meta( 'display_name' ),
 					'date'      => get_the_date(),
@@ -350,6 +358,8 @@ class Post_Feed_Module extends Core_Module {
 				the_excerpt();
 
 				$item['excerpt'] = ob_get_clean();
+
+				$item = apply_filters( 'core_post_feed_local_item_array', $item, $post_id, $atts );
 
 				$query_items['items'][ $post_id ] = $item;
 
@@ -436,6 +446,10 @@ class Post_Feed_Module extends Core_Module {
 
 			switch ( $filter ) {
 
+				case 'author':
+					$filters[] = $this->get_filter_author( $atts );
+					break;
+
 				case 'year':
 					$filters[] = $this->get_year_filter( $atts );
 					break;
@@ -469,6 +483,69 @@ class Post_Feed_Module extends Core_Module {
 			'options'       => $years,
 			'current_value' => ( ! empty( $atts['year'] ) ) ? $atts['year'] : '',
 			'class'         => 'pf_year',
+		);
+
+		return $filter;
+
+	} // End get_year_filter
+
+
+	private function get_filter_author( $atts ) {
+
+		// Taken from https://core.trac.wordpress.org/browser/tags/4.9.8/src/wp-includes/author-template.php#L421
+
+		global $wpdb;
+
+		$query_args = array(
+			'fields' => 'ids',
+		);
+
+		$post_type = ( ! empty( $atts['post_type'] ) ) ? $atts['post_type'] : 'post';
+
+		$authors = get_users( $query_args );
+
+		$author_count = array();
+
+		$author_options = array();
+
+		//$sql_query = $wpdb->prepare( 'SELECT DISTINCT post_author, COUNT(ID) AS count FROM %s WHERE post_type=%s GROUP BY post_author', array( $wpdb->posts, $post_type ) );
+
+		$sql_query = $wpdb->prepare( 'SELECT DISTINCT post_author, COUNT(ID) AS count FROM %5s WHERE post_type LIKE %s GROUP BY post_author', array( $wpdb->posts, $post_type ) );
+
+		$post_query = $wpdb->get_results( $sql_query );
+
+		if ( is_array( $post_query ) ) {
+
+			foreach ( $post_query as $row ) {
+
+				$author_count[ $row->post_author ] = $row->count;
+
+			} // End foreach
+		} // End if
+
+		foreach ( $authors as $author_id ) {
+
+			$author = get_userdata( $author_id );
+
+			$posts = isset( $author_count[ $author->ID ] ) ? $author_count[ $author->ID ] : 0;
+
+			if ( ! $posts ) {
+
+				continue;
+
+			} // End if
+
+			$author_options[ $author->ID ] = $author->display_name . ' (' . $posts . ')';
+
+		} // End foreach
+
+		$filter = array(
+			'type'          => 'built-in',
+			'name'          => 'pf_author',
+			'label'         => 'Author',
+			'options'       => $author_options,
+			'current_value' => ( ! empty( $atts['author'] ) ) ? $atts['author'] : '',
+			'class'         => 'pf_author',
 		);
 
 		return $filter;
@@ -516,19 +593,28 @@ class Post_Feed_Module extends Core_Module {
 
 		$display = ( ! empty( $atts['display'] ) ) ? $atts['display'] : 'promo';
 
-		if ( ! empty( $items ) ) {
+		$html = apply_filters( 'core_post_feed_items_html', '', $items, $atts );
 
-			switch ( $display ) {
+		if ( ! empty( $html ) ) {
 
-				default:
-					$this->the_promo_display( $items, $atts );
-					break;
+			echo wp_kses_post( $html );
 
-			} // End switch
 		} else {
 
-			include __DIR__ . '/displays/no-items-found.php';
+			if ( ! empty( $items ) ) {
 
+				switch ( $display ) {
+
+					default:
+						$this->the_promo_display( $items, $atts );
+						break;
+
+				} // End switch
+			} else {
+
+				include __DIR__ . '/displays/no-items-found.php';
+
+			} // End if
 		} // End if
 
 		echo '</div>';
@@ -697,6 +783,12 @@ class Post_Feed_Module extends Core_Module {
 		if ( ! empty( $atts['year'] ) ) {
 
 			$query_args['year'] = $atts['year'];
+
+		} // End if
+
+		if ( ! empty( $atts['author'] ) ) {
+
+			$query_args['author'] = $atts['author'];
 
 		} // End if
 

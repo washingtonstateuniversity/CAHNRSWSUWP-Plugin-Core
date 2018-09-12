@@ -482,3 +482,65 @@ ul.breadcrumbs {
 .core-grant-content .grant-label {
     font-weight: bold;
 }
+
+.core-grant-list-display-item {
+    position: relative;
+    border-bottom: 1px solid #ddd;
+    padding: 8px;
+}
+
+.core-grant-list-display-item h3,
+.core-grant-list-display-item h2 {
+    font-size: 16px;
+}
+
+.core-grant-list-display-item ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.core-grant-list-display-item ul span {
+    font-weight: bold;
+}
+
+.core-grant-list-display-item .has-project-id .project-id {
+    width: 60px;
+    float: left;
+    text-align: center;
+    background-color: #eee;
+    padding: 18px 0;
+    font-weight: bold;
+}
+
+.core-grant-list-display-item .has-project-id:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.core-grant-list-display-item .has-project-id .project-pi,
+.core-grant-list-display-item .has-project-id .grant-title {
+    padding-left: 12px;
+    margin-left: 60px;
+    display: block;
+    box-sizing: border-box;
+}
+
+.core-grant-list-display-item .project-pi {
+    font-size: 14px;
+}
+
+.core-grant-list-display-item .grant-link a {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 0;
+}
+
+.core-grant-list-display-item .grant-link a:hover {
+    background-color: rgba(0,0,0,0.1);
+}
