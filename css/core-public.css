@@ -12,6 +12,7 @@
 * -- Pagination
 * -- Items
 * -- Grants
+* -- MailChimp
 */
 
 /* ============================ Module: Post Feed ============================ */
@@ -543,4 +544,41 @@ ul.breadcrumbs {
 
 .core-grant-list-display-item .grant-link a:hover {
     background-color: rgba(0,0,0,0.1);
+}
+
+/* ============================ Module: MailChimp ============================ */
+.mc_embed_signup fieldset {
+    background-color: #eee;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.mc_embed_signup .mc-field-group {
+    padding-bottom: 10px;
+}
+
+.mc_embed_signup label {
+    display: block;
+}
+
+.mc_embed_signup input {
+    width: 100%;
+    height: 35px;
+    line-height: 35px;
+}
+
+.mc_embed_signup input[type="submit"] {
+    background-color: #981e32;
+    color: #fff;
+    text-transform: uppercase;
+    border-radius: 0;
+    border: none;
+    outline: none;
+    height: 40px;
+}
+.mc_embed_signup input[type="submit"]:hover {
+    background-color: #23282b;
+    color: #fff;
 }

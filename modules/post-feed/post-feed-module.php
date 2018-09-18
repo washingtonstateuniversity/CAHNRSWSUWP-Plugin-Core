@@ -36,8 +36,8 @@ class Post_Feed_Module extends Core_Module {
 		'order'                  => 'DESC',
 		'offset'                 => 0,
 		'page'                   => 1,
-		'taxonomy_filters'       => '',
-		'built_in_filters'       => '',
+		//'taxonomy_filters'       => '',
+		//'built_in_filters'       => '',
 		'show_pagination'        => '',
 		'show_search'            => '',
 		'display'                => 'promo',
@@ -53,6 +53,8 @@ class Post_Feed_Module extends Core_Module {
 		'show_image_placeholder' => '',
 		'year'                   => '',
 		'author'                 => '',
+		'exclude_author'         => '',
+		'filters'                => '',
 	);
 
 
@@ -120,7 +122,7 @@ class Post_Feed_Module extends Core_Module {
 
 	private function the_filters( $atts ) {
 
-		if ( ! empty( $atts['taxonomy_filters'] ) || ! empty( $atts['meta_filters'] ) || ! empty( $atts['built_in_filters'] ) ) {
+		if ( ! empty( $atts['filters'] ) ) {
 
 			$filters_array = $this->get_filters_array( $atts );
 
@@ -380,9 +382,43 @@ class Post_Feed_Module extends Core_Module {
 
 	private function get_filters_array( $atts ) {
 
-		$filters_array = array();
+		$filters = array();
 
-		if ( ! empty( $atts['taxonomy_filters'] ) ) {
+		if ( ! empty( $atts['filters'] ) ) {
+
+			$atts_filters = explode( '},{', $atts['filters'] );
+
+			foreach ( $atts_filters as $atts_filter ) {
+
+				$filter = array();
+
+				$atts_filter = str_replace( array( '{', '}' ), '', $atts_filter );
+
+				$filter_settings = $this->parse_filter_atts( $atts_filter );
+
+				switch ( $filter_settings['type'] ) {
+
+					case 'built-in':
+						$filter = $this->get_filter_built_in( $filter_settings, $atts );
+						break;
+
+					case 'taxonomy':
+						$filter = $this->get_filter_taxonomy( $filter_settings, $atts );
+						break;
+
+				} // End Switch
+
+				if ( ! empty( $filter ) ) {
+
+					$filters[] = $filter;
+
+				} // End if
+			} // End foreach
+		} // End if
+
+		/*$filters_array = array();
+
+		if ( ! empty( $atts['filters'] ) ) {
 
 			$filters_set = explode( '},{', $atts['taxonomy_filters'] );
 
@@ -431,12 +467,190 @@ class Post_Feed_Module extends Core_Module {
 			} // End if
 		} // End if
 
-		return $filters_array;
+		if ( ! empty( $atts['filters'] ) ) {
+
+			$atts_filters = explode( '},{', $atts['filters'] );
+
+			foreach ( $atts_filters as $atts_filter ) {
+
+				$filter = array();
+
+				$atts_filter = str_replace( array( '{', '}' ), '', $atts_filter );
+
+				$filter_settings = $this->parse_filter_atts( $atts_filter );
+
+				switch ( $filter_settings['type'] ) {
+
+					case 'built-in':
+						$filter = $this->get_filter_built_in( $filter_settings, $atts );
+						break;
+
+					case 'taxonomy':
+						$filter = $this->get_filter_taxonomy( $filter_settings, $atts );
+						break;
+
+				} // End Switch
+
+				if ( ! empty( $filter ) ) {
+
+					$filters[] = $filter;
+
+				} // End if
+			} // End foreach
+		} // End if
+
+		$filters = array_merge( $filters_array, $filters );*/
+
+		return $filters;
 
 	} // End get_filters_html
 
 
-	private function get_built_in_filters( $defined_filters, $atts ) {
+	private function get_filter_taxonomy( $filter_settings, $atts ) {
+
+		$taxonomy = ( ! empty( $filter_settings['name'] ) ) ? $filter_settings['name'] : 'category';
+
+		$include_terms = ( ! empty( $filter_settings['terms'] ) ) ? $filter_settings['terms'] : array();
+
+		$filter_array = array(
+			'type'           => 'taxonomy',
+			'name'           => 'taxonomies[' . $taxonomy . ']',
+			'taxonomy'       => $taxonomy,
+			'class'          => $taxonomy,
+			'label'          => ( ! empty( $filter_settings['label'] ) ) ? $filter_settings['label'] : 'Filter By:',
+			'terms'          => $include_terms,
+			'current_value'  => '',
+			'options'   => $this->get_filter_term_options( $taxonomy, $include_terms ),
+		);
+
+		if ( isset( $_REQUEST['taxonomies'][ $taxonomy ] ) && ! empty( $_REQUEST['taxonomies'][ $taxonomy ] ) ) {
+
+			$filter_array['current_value'] = sanitize_text_field( $_REQUEST['taxonomies'][ $taxonomy ] );
+
+		} // End if
+
+		return $filter_array;
+
+	} // End get_filter_taxonomy
+
+
+	private function get_filter_built_in( $filter_settings, $atts ) {
+
+		$filter = array();
+
+		if ( ! empty( $filter_settings['name'] ) ) {
+
+			switch ( $filter_settings['name'] ) {
+
+				case 'author':
+					$filter_array = $this->get_filter_built_in_author( $filter_settings, $atts );
+					break;
+
+				case 'year':
+					$filter_array = $this->get_filter_built_in_year( $filter_settings, $atts );
+					break;
+
+			} // End switch
+
+			if ( ! empty( $filter_array ) ) {
+
+				$filter = $filter_array;
+
+			} // End if
+		} // End if
+
+		return $filter;
+
+	} // End get_filter_built_in
+
+
+	private function get_filter_built_in_author( $filter_settings, $atts ) {
+
+		// Taken from https://core.trac.wordpress.org/browser/tags/4.9.8/src/wp-includes/author-template.php#L421
+
+		global $wpdb;
+
+		$query_args = array(
+			'fields' => 'ids',
+		);
+
+		$post_type = ( ! empty( $atts['post_type'] ) ) ? $atts['post_type'] : 'post';
+
+		$authors = get_users( $query_args );
+
+		$author_count = array();
+
+		$author_options = array();
+
+		$exclude = ( ! empty( $filter_settings['exclude'] ) && is_array( $filter_settings['exclude'] ) ) ? $filter_settings['exclude'] : array();
+
+		//$sql_query = $wpdb->prepare( 'SELECT DISTINCT post_author, COUNT(ID) AS count FROM %s WHERE post_type=%s GROUP BY post_author', array( $wpdb->posts, $post_type ) );
+
+		$sql_query = $wpdb->prepare( 'SELECT DISTINCT post_author, COUNT(ID) AS count FROM %5s WHERE post_type LIKE %s GROUP BY post_author', array( $wpdb->posts, $post_type ) );
+
+		$post_query = $wpdb->get_results( $sql_query );
+
+		if ( is_array( $post_query ) ) {
+
+			foreach ( $post_query as $row ) {
+
+				$author_count[ $row->post_author ] = $row->count;
+
+			} // End foreach
+		} // End if
+
+		foreach ( $authors as $author_id ) {
+
+			$author = get_userdata( $author_id );
+
+			if ( ! in_array( $author->display_name, $exclude, true ) ) {
+
+				$posts = isset( $author_count[ $author->ID ] ) ? $author_count[ $author->ID ] : 0;
+
+				if ( ! $posts ) {
+
+					continue;
+
+				} // End if
+
+				$author_options[ $author->ID ] = $author->display_name;
+
+			} // End if
+		} // End foreach
+
+		$filter = array(
+			'type'          => 'built-in',
+			'name'          => 'pf_author',
+			'label'         => 'Author',
+			'options'       => $author_options,
+			'current_value' => ( ! empty( $atts['author'] ) ) ? $atts['author'] : '',
+			'class'         => 'pf_author',
+		);
+
+		return $filter;
+
+	} // End get_author_filter
+
+
+	private function parse_filter_atts( $filter_atts ) {
+
+		$filter_array = explode( '|', $filter_atts );
+
+		$filter = array(
+			'type'     => ( ! empty( $filter_array[0] ) ) ? $filter_array[0] : 'taxonomy',
+			'name'     => ( ! empty( $filter_array[1] ) ) ? $filter_array[1] : 'category',
+			'label'    => ( ! empty( $filter_array[2] ) ) ? $filter_array[2] : 'Categories',
+			'terms'    => ( ! empty( $filter_array[3] ) ) ? explode( ',', $filter_array[3] ) : array(),
+			'exclude'  => ( ! empty( $filter_array[4] ) ) ? explode( ',', $filter_array[4] ) : array(),
+			'class'    => ( ! empty( $filter_array[5] ) ) ? $filter_array[5] : '',
+		);
+
+		return $filter;
+
+	}
+
+
+	/*private function get_built_in_filters( $defined_filters, $atts ) {
 
 		$filters = array();
 
@@ -459,16 +673,16 @@ class Post_Feed_Module extends Core_Module {
 
 		return $filters;
 
-	} // End get_defined_filters
+	} // End get_defined_filters*/
 
 
-	private function get_year_filter( $atts ) {
+	private function get_filter_built_in_year( $filter_settings, $atts ) {
 
 		$years = array();
 
 		$current_year = date( 'Y' );
 
-		for ( $y = 0; $y < 50; $y++ ) {
+		for ( $y = 0; $y < 20; $y++ ) {
 
 			$year = $current_year - $y;
 
@@ -490,7 +704,7 @@ class Post_Feed_Module extends Core_Module {
 	} // End get_year_filter
 
 
-	private function get_filter_author( $atts ) {
+	/*private function get_filter_author( $atts ) {
 
 		// Taken from https://core.trac.wordpress.org/browser/tags/4.9.8/src/wp-includes/author-template.php#L421
 
@@ -535,7 +749,7 @@ class Post_Feed_Module extends Core_Module {
 
 			} // End if
 
-			$author_options[ $author->ID ] = $author->display_name . ' (' . $posts . ')';
+			$author_options[ $author->ID ] = $author->display_name;
 
 		} // End foreach
 
@@ -550,7 +764,7 @@ class Post_Feed_Module extends Core_Module {
 
 		return $filter;
 
-	} // End get_year_filter
+	} // End get_year_filter*/
 
 
 	private function get_filter_term_options( $taxonomy, $term_ids ) {
