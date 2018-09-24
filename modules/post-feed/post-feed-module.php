@@ -36,8 +36,6 @@ class Post_Feed_Module extends Core_Module {
 		'order'                  => 'DESC',
 		'offset'                 => 0,
 		'page'                   => 1,
-		//'taxonomy_filters'       => '',
-		//'built_in_filters'       => '',
 		'show_pagination'        => '',
 		'show_search'            => '',
 		'display'                => 'promo',
@@ -416,91 +414,6 @@ class Post_Feed_Module extends Core_Module {
 			} // End foreach
 		} // End if
 
-		/*$filters_array = array();
-
-		if ( ! empty( $atts['filters'] ) ) {
-
-			$filters_set = explode( '},{', $atts['taxonomy_filters'] );
-
-			foreach ( $filters_set as $filter ) {
-
-				$filter = str_replace( array( '{', '}' ), '', $filter );
-
-				$filter_group = explode( '|', $filter );
-
-				if ( ! empty( $filter_group ) ) {
-
-					$taxonomy = ( ! empty( $filter_group[0] ) ) ? $filter_group[0] : 'category';
-					$terms = ( ! empty( $filter_group[2] ) ) ? explode( ',', $filter_group[2] ) : array();
-
-					$filter_array = array(
-						'type'           => 'taxonomy',
-						'name'           => 'taxonomies[' . $taxonomy . ']',
-						'taxonomy'       => $taxonomy,
-						'class'          => $taxonomy,
-						'label'          => ( ! empty( $filter_group[1] ) ) ? $filter_group[1] : 'Filter By:',
-						'terms'          => $terms,
-						'current_value'  => '',
-						'options'   => $this->get_filter_term_options( $taxonomy, $terms ),
-					);
-
-					if ( isset( $_REQUEST['taxonomies'][ $taxonomy ] ) && ! empty( $_REQUEST['taxonomies'][ $taxonomy ] ) ) {
-
-						$filter_array['current_value'] = sanitize_text_field( $_REQUEST['taxonomies'][ $taxonomy ] );
-
-					} // End if
-
-					$filters_array[] = $filter_array;
-
-				} // End if
-			} // End foreach
-		} // End if
-
-		if ( ! empty( $atts['built_in_filters'] ) ) {
-
-			$defined_filters = $this->get_built_in_filters( $atts['built_in_filters'], $atts );
-
-			if ( ! empty( $defined_filters ) ) {
-
-				$filters_array = array_merge( $filters_array, $defined_filters );
-
-			} // End if
-		} // End if
-
-		if ( ! empty( $atts['filters'] ) ) {
-
-			$atts_filters = explode( '},{', $atts['filters'] );
-
-			foreach ( $atts_filters as $atts_filter ) {
-
-				$filter = array();
-
-				$atts_filter = str_replace( array( '{', '}' ), '', $atts_filter );
-
-				$filter_settings = $this->parse_filter_atts( $atts_filter );
-
-				switch ( $filter_settings['type'] ) {
-
-					case 'built-in':
-						$filter = $this->get_filter_built_in( $filter_settings, $atts );
-						break;
-
-					case 'taxonomy':
-						$filter = $this->get_filter_taxonomy( $filter_settings, $atts );
-						break;
-
-				} // End Switch
-
-				if ( ! empty( $filter ) ) {
-
-					$filters[] = $filter;
-
-				} // End if
-			} // End foreach
-		} // End if
-
-		$filters = array_merge( $filters_array, $filters );*/
-
 		return $filters;
 
 	} // End get_filters_html
@@ -650,32 +563,6 @@ class Post_Feed_Module extends Core_Module {
 	}
 
 
-	/*private function get_built_in_filters( $defined_filters, $atts ) {
-
-		$filters = array();
-
-		$defined_filters = explode( ',', $defined_filters );
-
-		foreach ( $defined_filters as $filter ) {
-
-			switch ( $filter ) {
-
-				case 'author':
-					$filters[] = $this->get_filter_author( $atts );
-					break;
-
-				case 'year':
-					$filters[] = $this->get_year_filter( $atts );
-					break;
-
-			} // End switch
-		} // End foreach
-
-		return $filters;
-
-	} // End get_defined_filters*/
-
-
 	private function get_filter_built_in_year( $filter_settings, $atts ) {
 
 		$years = array();
@@ -702,69 +589,6 @@ class Post_Feed_Module extends Core_Module {
 		return $filter;
 
 	} // End get_year_filter
-
-
-	/*private function get_filter_author( $atts ) {
-
-		// Taken from https://core.trac.wordpress.org/browser/tags/4.9.8/src/wp-includes/author-template.php#L421
-
-		global $wpdb;
-
-		$query_args = array(
-			'fields' => 'ids',
-		);
-
-		$post_type = ( ! empty( $atts['post_type'] ) ) ? $atts['post_type'] : 'post';
-
-		$authors = get_users( $query_args );
-
-		$author_count = array();
-
-		$author_options = array();
-
-		//$sql_query = $wpdb->prepare( 'SELECT DISTINCT post_author, COUNT(ID) AS count FROM %s WHERE post_type=%s GROUP BY post_author', array( $wpdb->posts, $post_type ) );
-
-		$sql_query = $wpdb->prepare( 'SELECT DISTINCT post_author, COUNT(ID) AS count FROM %5s WHERE post_type LIKE %s GROUP BY post_author', array( $wpdb->posts, $post_type ) );
-
-		$post_query = $wpdb->get_results( $sql_query );
-
-		if ( is_array( $post_query ) ) {
-
-			foreach ( $post_query as $row ) {
-
-				$author_count[ $row->post_author ] = $row->count;
-
-			} // End foreach
-		} // End if
-
-		foreach ( $authors as $author_id ) {
-
-			$author = get_userdata( $author_id );
-
-			$posts = isset( $author_count[ $author->ID ] ) ? $author_count[ $author->ID ] : 0;
-
-			if ( ! $posts ) {
-
-				continue;
-
-			} // End if
-
-			$author_options[ $author->ID ] = $author->display_name;
-
-		} // End foreach
-
-		$filter = array(
-			'type'          => 'built-in',
-			'name'          => 'pf_author',
-			'label'         => 'Author',
-			'options'       => $author_options,
-			'current_value' => ( ! empty( $atts['author'] ) ) ? $atts['author'] : '',
-			'class'         => 'pf_author',
-		);
-
-		return $filter;
-
-	} // End get_year_filter*/
 
 
 	private function get_filter_term_options( $taxonomy, $term_ids ) {
@@ -912,69 +736,6 @@ class Post_Feed_Module extends Core_Module {
 		return $excerpt;
 
 	} // End get_item_excerpt
-
-
-	/*private function get_local_items( $atts ) {
-
-		$items = array();
-
-		$query_args = $this->get_local_query_args( $atts );
-
-		$the_query = new \WP_Query( $query_args );
-
-		// The Loop
-		if ( $the_query->have_posts() ) {
-
-			while ( $the_query->have_posts() ) {
-
-				$the_query->the_post();
-
-				$post_id = get_the_ID();
-
-				$item = array(
-					'title'     => get_the_title(),
-					'author'    => get_the_author_meta( 'display_name' ),
-					'date'      => get_the_date(),
-					'has_image' => false,
-					'image'     => array(),
-					'link'      => get_the_permalink(),
-				);
-
-				if ( has_post_thumbnail() ) {
-
-					$item['has_image'] = true;
-
-					$item['image'] = array(
-						'thumbnail' => the_post_thumbnail_url(),
-						'medium'    => the_post_thumbnail_url( 'medium' ),
-						'large'     => the_post_thumbnail_url( 'large' ),
-						'full'      => the_post_thumbnail_url( 'full' ),
-					);
-				} // End if
-
-				ob_start();
-
-				the_content();
-
-				$item['content'] = ob_get_clean();
-
-				ob_start();
-
-				the_excerpt();
-
-				$item['excerpt'] = ob_get_clean();
-
-				$items[ $post_id ] = $item;
-
-			} // End while
-
-			wp_reset_postdata();
-
-		} // End if
-
-		return $items;
-
-	} // End get_local_items*/
 
 
 	private function get_local_query_args( $atts ) {
