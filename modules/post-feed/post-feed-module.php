@@ -531,6 +531,8 @@ class Post_Feed_Module extends Core_Module {
 			} // End if
 		} // End foreach
 
+		usort( $author_options, array( $this, 'sort_authors' ) );
+
 		$filter = array(
 			'type'          => 'built-in',
 			'name'          => 'pf_author',
@@ -543,6 +545,17 @@ class Post_Feed_Module extends Core_Module {
 		return $filter;
 
 	} // End get_author_filter
+
+
+	public function sort_authors( $a, $b ) {
+
+		$a_name = array_pop( explode( ' ', $a ) );
+
+		$b_name = array_pop( explode( ' ', $b ) );
+
+		return ( $a_name < $b_name ) ? -1 : 1;
+
+	} // End sort_authors
 
 
 	private function parse_filter_atts( $filter_atts ) {
