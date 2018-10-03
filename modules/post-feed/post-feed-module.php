@@ -512,6 +512,8 @@ class Post_Feed_Module extends Core_Module {
 			} // End foreach
 		} // End if
 
+		//uasort( $authors, array( $this, 'sort_authors' ) );
+
 		foreach ( $authors as $author_id ) {
 
 			$author = get_userdata( $author_id );
@@ -531,7 +533,7 @@ class Post_Feed_Module extends Core_Module {
 			} // End if
 		} // End foreach
 
-		usort( $author_options, array( $this, 'sort_authors' ) );
+		uasort( $author_options, array( $this, 'sort_authors' ) );
 
 		$filter = array(
 			'type'          => 'built-in',
@@ -548,6 +550,10 @@ class Post_Feed_Module extends Core_Module {
 
 
 	public function sort_authors( $a, $b ) {
+
+		/*$a_name = array_pop( explode( ' ', $a->display_name ) );
+
+		$b_name = array_pop( explode( ' ', $b->display_name ) );*/
 
 		$a_name = array_pop( explode( ' ', $a ) );
 
