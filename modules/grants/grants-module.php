@@ -63,6 +63,34 @@ class Grants_Module extends Core_Module {
 			'ignore_empty'       => true, // Ignore if data is an empty string
 			'sanitize_callback'  => 'sanitize_grants_post_meta', // Custom sanitization callback
 		),
+		'_grant_publications_content' => array( // Settings key
+			'sanitize_type'      => 'custom', // Type of data - used to sanitize the data
+			'default'            => '', // Default value
+			'check_isset'        => true, // Do a check if isset, otherwise will use default value
+			'ignore_empty'       => true, // Ignore if data is an empty string
+			'sanitize_callback'  => 'sanitize_grants_content', // Custom sanitization callback
+		),
+		'_grant_funding_content' => array( // Settings key
+			'sanitize_type'      => 'custom', // Type of data - used to sanitize the data
+			'default'            => '', // Default value
+			'check_isset'        => true, // Do a check if isset, otherwise will use default value
+			'ignore_empty'       => true, // Ignore if data is an empty string
+			'sanitize_callback'  => 'sanitize_grants_content', // Custom sanitization callback
+		),
+		'_grant_impacts_content' => array( // Settings key
+			'sanitize_type'      => 'custom', // Type of data - used to sanitize the data
+			'default'            => '', // Default value
+			'check_isset'        => true, // Do a check if isset, otherwise will use default value
+			'ignore_empty'       => true, // Ignore if data is an empty string
+			'sanitize_callback'  => 'sanitize_grants_content', // Custom sanitization callback
+		),
+		'_grant_admin_content' => array( // Settings key
+			'sanitize_type'      => 'custom', // Type of data - used to sanitize the data
+			'default'            => '', // Default value
+			'check_isset'        => true, // Do a check if isset, otherwise will use default value
+			'ignore_empty'       => true, // Ignore if data is an empty string
+			'sanitize_callback'  => 'sanitize_grants_content', // Custom sanitization callback
+		),
 	);
 
 
@@ -232,12 +260,25 @@ class Grants_Module extends Core_Module {
 		$clean = array(
 			'project_id'       => ( ! empty( $sent_value['project_id'] ) ) ? sanitize_text_field( $sent_value['project_id'] ) : '',
 			'annual_entries'   => ( ! empty( $sent_value['annual_entries'] ) ) ? $this->save_api->sanitize_array( $sent_value['annual_entries'] ) : array(),
-			'additional_funds' => ( ! empty( $sent_value['additional_funds'] ) ) ? $this->save_api->sanitize_array( $sent_value['additional_funds'] ) : array(),
+			'additional_funding' => ( ! empty( $sent_value['additional_funding'] ) ) ? $this->save_api->sanitize_array( $sent_value['additional_funding'] ) : array(),
 		);
 
 		return $clean;
 
 	} // End sanitize_grants_post_meta
+
+
+	/**
+	 * Sanitize the post data before saving. This is a custom callback passed in the 'sanitize_callback' of the setting.
+	 * @since 0.0.1
+	 */
+	public function sanitize_grants_content( $key, $sent_value ) {
+
+		$clean = wp_kses_post( $sent_value );
+
+		return $clean;
+
+	} // End sanitize_grants_content
 
 
 	/**
@@ -266,7 +307,7 @@ class Grants_Module extends Core_Module {
 			$grants_array = array(
 				'publications_content' => get_post_meta( $post->ID, '_grant_publications_content', true ), // string HTML for publications.
 				'funding_content'      => get_post_meta( $post->ID, '_grant_funding_content', true ), // string HTML for funding.
-				'impact_content'       => get_post_meta( $post->ID, '_grant_impact_content', true ), // string HTML for impact.
+				'impact_content'       => get_post_meta( $post->ID, '_grant_impacts_content', true ), // string HTML for impact.
 				'admin_content'        => get_post_meta( $post->ID, '_grant_admin_content', true ), // string HTML for admin.
 				'project_id'           => ( ! empty( $grants_meta['project_id'] ) ) ? $grants_meta['project_id'] : '', // string Project ID
 				'status'               => $this->get_grant_status( $post->ID ),
@@ -274,7 +315,6 @@ class Grants_Module extends Core_Module {
 				'annual_entries'       => $this->get_annual_entries( $post ), // array Annual entries array.
 				'additional_funding'   => $this->get_additional_funds( $post ), // array Additional funds array.
 			);
-
 
 			$grants_array = apply_filters( 'core_grants_legacy_meta', $grants_array, $post );
 
@@ -294,7 +334,7 @@ class Grants_Module extends Core_Module {
 
 			include __DIR__ . '/displays/grant-meta-content.php';
 
-			foreach( $annual_entries as $entry ) {
+			foreach ( $annual_entries as $entry ) {
 
 				if ( ! empty( $entry['year'] ) ) {
 
@@ -309,7 +349,6 @@ class Grants_Module extends Core_Module {
 					include __DIR__ . '/displays/grant-annual-entry-content.php';
 
 				} // End if
-
 			} // End foreach
 
 			include __DIR__ . '/displays/grant-content.php';
@@ -405,13 +444,19 @@ class Grants_Module extends Core_Module {
 			// Get the grants meta data - stored as an array under a single key.
 			$grants_meta = get_post_meta( $post->ID, '_grant', true );
 
+			if ( isset( $_GET['debut'] ) ) {
+
+				var_dump( $grants_meta );
+
+			};
+
 			// Add nonce field to metabox.
 			wp_nonce_field( 'core_grants_module_save_post', 'core_grants_module' );
 
 			$grants_array = array(
 				'publications_content' => get_post_meta( $post->ID, '_grant_publications_content', true ), // string HTML for publications.
 				'funding_content'      => get_post_meta( $post->ID, '_grant_funding_content', true ), // string HTML for funding.
-				'impact_content'       => get_post_meta( $post->ID, '_grant_impact_content', true ), // string HTML for impact.
+				'impact_content'       => get_post_meta( $post->ID, '_grant_impacts_content', true ), // string HTML for impact.
 				'admin_content'        => get_post_meta( $post->ID, '_grant_admin_content', true ), // string HTML for admin.
 				'project_id'           => ( ! empty( $grants_meta['project_id'] ) ) ? $grants_meta['project_id'] : '', // string Project ID
 				'investigators'        => $this->get_investigators_terms(), // array Term_ID => Term Name Investigators taxonomy terms.
@@ -555,12 +600,15 @@ class Grants_Module extends Core_Module {
 			// Loop through annual entries.
 			foreach ( $grants_meta['annual_entries'] as $index => $entry ) {
 
-				// Set the entry title from the year.
-				$entry['title'] = ( ! empty( $entry['year'] ) ) ? 'Entry For: ' . $entry['year'] : 'Error In Entry';
+				if ( ! empty( $entry['year'] ) ) {
 
-				// Merge entry with default data (will overwrite default) and add to $annual_entries.
-				$annual_entries[ $index ] = array_merge( $entry_data, $entry );
+					// Set the entry title from the year.
+					$entry['title'] = ( ! empty( $entry['year'] ) ) ? 'Entry For: ' . $entry['year'] : 'Error In Entry';
 
+					// Merge entry with default data (will overwrite default) and add to $annual_entries.
+					$annual_entries[ $index ] = array_merge( $entry_data, $entry );
+
+				} // End if
 			} // End foreach;
 		} // End if
 

@@ -82,7 +82,7 @@
 		<div class="core-form-content">
 			<div class="core-field core-wp-editor-field">
 				<label>Publications</label>
-				<?php wp_editor( $publications_content, '_grants_publications_content', array( 'editor_height' => '200px' ) ); ?>
+				<?php wp_editor( $publications_content, '_grant_publications_content', array( 'editor_height' => '200px' ) ); ?>
 			</div>
 		</div>
 	</fieldset>
@@ -90,7 +90,7 @@
 		<div class="core-form-content">
 			<div class="core-field core-wp-editor-field">
 				<label>Additional Funds Leveraged</label>
-				<?php wp_editor( $funding_content, '_grants_additional_funding_content', array( 'editor_height' => '200px' ) ); ?>
+				<?php wp_editor( $funding_content, '_grant_funding_content', array( 'editor_height' => '200px' ) ); ?>
 			</div>
 		</div>
 	</fieldset>
@@ -98,7 +98,7 @@
 		<div class="core-form-content">
 			<div class="core-field core-wp-editor-field">
 				<label>Impacts and Outcomes</label>
-				<?php wp_editor( $impact_content, '_grants_impacts_content', array( 'editor_height' => '200px' ) ); ?>
+				<?php wp_editor( $impact_content, '_grant_impacts_content', array( 'editor_height' => '200px' ) ); ?>
 			</div>
 		</div>
 	</fieldset>
@@ -106,7 +106,7 @@
 		<div class="core-form-content">
 			<div class="core-field core-wp-editor-field">
 				<label>Administrative Comments</label>
-				<?php wp_editor( $admin_content, '_grants_admin_content', array( 'editor_height' => '200px' ) ); ?>
+				<?php wp_editor( $admin_content, '_grant_admin_content', array( 'editor_height' => '200px' ) ); ?>
 			</div>
 		</div>
 	</fieldset>
