@@ -53,6 +53,10 @@ class Post_Feed_Module extends Core_Module {
 		'author'                 => '',
 		'exclude_author'         => '',
 		'filters'                => '',
+		'start_date'             => '',
+		'show_venue'             => '1',
+		'more_link'              => '',
+		'more_label'             => 'More',
 	);
 
 
@@ -60,6 +64,8 @@ class Post_Feed_Module extends Core_Module {
 	 * Init the module here
 	 */
 	public function init() {
+
+		require_once __DIR__ . '/class-post-feed-display.php';
 
 		add_shortcode( 'post_feed', array( $this, 'render_shortcode' ) );
 
@@ -76,103 +82,27 @@ class Post_Feed_Module extends Core_Module {
 
 		$query_items = $this->get_query_items( $atts );
 
+		$atts['pages'] = ( ! empty( $query_items['pages'] ) ) ? (int) $query_items['pages'] : 0;
+
+		$atts['per_page'] = ( ! empty( $query_items['per_page'] ) ) ? (int) $query_items['per_page'] : 10;
+
+		$atts['total_items'] = ( ! empty( $query_items['total_items'] ) ) ? (int) $query_items['total_items'] : 0;
+
+		$atts['filter_array'] = ( ! empty( $atts['filters'] ) ) ? $this->get_filters_array( $atts ) : array();
+
 		$items = ( ! empty( $query_items['items'] ) ) ? $query_items['items'] : array();
 
-		$id = ( ! empty( $atts['id'] ) ) ? $atts['id'] : 'core-post-feed';
-
-		$html = '';
+		$post_feed_display = new Post_Feed_Display();
 
 		ob_start();
 
-		echo '<div class="core-post-feed"><form class="core-post-form" method="get">';
+		$post_feed_display->the_display( $items, $atts );
 
-		$this->the_search( $atts );
-
-		$this->the_filters( $atts );
-
-		$this->the_pagination( $query_items, $atts );
-
-		$this->the_items_html( $items, $atts );
-
-		$this->the_pagination( $query_items, $atts, true );
-
-		echo '</div></form>';
-
-		$html .= ob_get_clean();
+		$html = ob_get_clean();
 
 		return $html;
 
 	} // End render_shortcode
-
-
-	private function the_search( $atts ) {
-
-		if ( ! empty( $atts['show_search'] ) ) {
-
-			$keyword = $atts['s'];
-
-			include __DIR__ . '/displays/search.php';
-
-		} // End if
-
-	} // End the_search
-
-
-	private function the_filters( $atts ) {
-
-		if ( ! empty( $atts['filters'] ) ) {
-
-			$filters_array = $this->get_filters_array( $atts );
-
-			if ( ! empty( $filters_array ) ) {
-
-				include __DIR__ . '/displays/filters.php';
-
-			} // End if
-		} // End if
-
-	} // End the_filters
-
-
-	private function the_pagination( $query_items, $atts, $is_end = false ) {
-
-		if ( ! empty( $atts['show_pagination'] ) ) {
-
-			$pages = ( ! empty( $query_items['pages'] ) ) ? (int) $query_items['pages'] : 0;
-
-			$current_page = ( ! empty( $query_items['page'] ) ) ? (int) $query_items['page'] : 1;
-
-			$per_page = ( ! empty( $query_items['per_page'] ) ) ? (int) $query_items['per_page'] : 10;
-
-			$total_items = ( ! empty( $query_items['total_items'] ) ) ? (int) $query_items['total_items'] : 0;
-
-			if ( 1 === $current_page ) {
-
-				$start_index = 1;
-
-			} else {
-
-				$start_index = ( ( $current_page - 1 ) * $per_page );
-
-			} // End if
-
-			$end_index = ( ( $current_page ) * $per_page );
-
-			if ( $end_index > $total_items ) {
-
-				$end_index = $total_items;
-
-			} // end if
-
-			$next_page = ( $current_page + 1 );
-
-			$previous_page = ( $current_page - 1 );
-
-			include __DIR__ . '/displays/pagination.php';
-
-		} // End if
-
-	} // End the_pagination
 
 
 	private function parse_shortcode_atts( $atts ) {
@@ -359,6 +289,14 @@ class Post_Feed_Module extends Core_Module {
 
 				$item['excerpt'] = ob_get_clean();
 
+				switch ( $item['post_type'] ) {
+
+					case 'tribe_events':
+						$item = $this->get_tribe_events_item( $item, $post_id, $atts );
+						break;
+
+				} // End switch
+
 				$item = apply_filters( 'core_post_feed_local_item_array', $item, $post_id, $atts );
 
 				$query_items['items'][ $post_id ] = $item;
@@ -372,6 +310,20 @@ class Post_Feed_Module extends Core_Module {
 		return $query_items;
 
 	}
+
+
+	private function get_tribe_events_item( $item, $post_id, $atts ) {
+
+		$item['start_date'] = ( function_exists( 'tribe_get_start_date' ) ) ? strtotime( tribe_get_start_date( $post_id, false, 'Y-m-d H:i:s' ) ) : '';
+
+		$item['link'] = ( function_exists( 'tribe_get_event_link' ) ) ? tribe_get_event_link( $post_id ) : '';
+
+		$item['venue'] = ( function_exists( 'tribe_get_venue' ) ) ? tribe_get_venue( $post_id ) : '';
+
+		return $item;
+
+	} // End get_tribe_events_item
+
 
 	private function get_remote_query_items( $atts ) {
 
@@ -551,10 +503,6 @@ class Post_Feed_Module extends Core_Module {
 
 	public function sort_authors( $a, $b ) {
 
-		/*$a_name = array_pop( explode( ' ', $a->display_name ) );
-
-		$b_name = array_pop( explode( ' ', $b->display_name ) );*/
-
 		$a_name = array_pop( explode( ' ', $a ) );
 
 		$b_name = array_pop( explode( ' ', $b ) );
@@ -644,119 +592,6 @@ class Post_Feed_Module extends Core_Module {
 	} // End get_filter_term_options
 
 
-	private function the_items_html( $items, $atts ) {
-
-		echo '<div class="core-post-feed-items">';
-
-		$display = ( ! empty( $atts['display'] ) ) ? $atts['display'] : 'promo';
-
-		$html = apply_filters( 'core_post_feed_items_html', '', $items, $atts );
-
-		if ( ! empty( $html ) ) {
-
-			echo wp_kses_post( $html );
-
-		} else {
-
-			if ( ! empty( $items ) ) {
-
-				switch ( $display ) {
-
-					default:
-						$this->the_promo_display( $items, $atts );
-						break;
-
-				} // End switch
-			} else {
-
-				include __DIR__ . '/displays/no-items-found.php';
-
-			} // End if
-		} // End if
-
-		echo '</div>';
-
-	} // end get_items_html
-
-
-	private function the_promo_display( $items, $atts ) {
-
-		foreach ( $items as $post_id => $item ) {
-
-			$title             = ( ! empty( $item['title'] ) ) ? $item['title'] : '';
-			$title_tag         = ( ! empty( $atts['title_tag'] ) ) ? $atts['title_tag'] : 'h3';
-			$content           = ( ! empty( $item['content'] ) ) ? $item['content'] : '';
-			$link              = ( ! empty( $item['link'] ) ) ? $item['link'] : '';
-			$author            = ( ! empty( $item['author'] ) ) ? $item['author'] : '';
-			$date              = ( ! empty( $item['date'] ) ) ? $item['date'] : '';
-			$image_placeholder = ( ! empty( $item['show_image_placeholder'] ) ) ? $item['show_image_placeholder'] : '';
-			$excerpt           = $this->get_item_excerpt( $item, $atts );
-			$image             = $this->get_item_image( $item, $atts );
-			$meta              = $this->get_item_meta( $item, $atts );
-
-			include __DIR__ . '/displays/promo.php';
-
-		} // End foreach
-
-	} // End get_promo_display
-
-
-	private function get_item_meta( $item, $atts ) {
-
-		$meta = array();
-
-		if ( ! empty( $item['author'] ) && ! empty( $atts['show_author'] ) ) {
-
-			$meta[] = '<span class="item-author">Posted by ' . $item['author'] . '</span>';
-
-		} // End if
-
-		if ( ! empty( $item['date'] ) && ! empty( $atts['show_date'] ) ) {
-
-			$meta[] = '<span class="item-date">' . $item['date'] . '</span>';
-
-		} // End if
-
-		return $meta;
-
-	} // End get_item_meta
-
-
-	private function get_item_image( $item, $atts ) {
-
-		$image = '';
-
-		if ( ! empty( $item['has_image'] ) && ! empty( $item['image'] ) ) {
-
-			$size = ( ! empty( $item['image_size'] ) ) ? $item['image_size'] : 'medium';
-
-			if ( ! empty( $item['image'][ $size ] ) ) {
-
-				$image = $item['image'][ $size ];
-
-			} // End if
-		} // End if
-
-		return $image;
-
-	} // End if
-
-
-	private function get_item_excerpt( $item, $atts ) {
-
-		$excerpt = ( ! empty( $item['excerpt'] ) ) ? $item['excerpt'] : '';
-
-		if ( ! empty( $atts['excerpt_length'] ) ) {
-
-			$excerpt = wp_trim_words( $excerpt, $atts['excerpt_length'] );
-
-		} // End if
-
-		return $excerpt;
-
-	} // End get_item_excerpt
-
-
 	private function get_local_query_args( $atts ) {
 
 		$query_args = array(
@@ -767,6 +602,15 @@ class Post_Feed_Module extends Core_Module {
 			'order'          => $atts['order'],
 			'paged'          => $atts['page'],
 		);
+
+		switch ( $atts['post_type'] ) {
+
+			case 'tribe_events':
+				$query_args['order']      = 'ASC';
+				$query_args['start_date'] = ( ! empty( $atts['start_date'] ) ) ? $atts['start_date'] : date( 'Y-m-d H:i:s' );
+				break;
+
+		} // End switch
 
 		if ( ! empty( $atts['s'] ) ) {
 
