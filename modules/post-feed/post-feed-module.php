@@ -256,6 +256,8 @@ class Post_Feed_Module extends Core_Module {
 				$post_id = get_the_ID();
 
 				$item = array(
+					'is_local'  => true,
+					'post_id'   => $post_id,
 					'post_type' => get_post_type(),
 					'title'     => get_the_title(),
 					'author'    => get_the_author_meta( 'display_name' ),
