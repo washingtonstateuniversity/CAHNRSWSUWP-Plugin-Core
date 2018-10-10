@@ -36,6 +36,7 @@ class Post_Feed_Module extends Core_Module {
 		'order'                  => 'DESC',
 		'offset'                 => 0,
 		'page'                   => 1,
+		'post_ids'               => '',
 		'show_pagination'        => '',
 		'show_search'            => '',
 		'display'                => 'promo',
@@ -613,6 +614,12 @@ class Post_Feed_Module extends Core_Module {
 				break;
 
 		} // End switch
+
+		if ( ! empty( $atts['post_ids'] ) ) {
+
+			$query_args['post__in'] = explode( ',', $atts['post_ids'] );
+
+		} // End if
 
 		if ( ! empty( $atts['s'] ) ) {
 
