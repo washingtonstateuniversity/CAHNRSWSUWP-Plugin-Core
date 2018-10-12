@@ -655,8 +655,6 @@ class Post_Feed_Module extends Core_Module {
 
 		} // End if
 
-		//var_dump( $query_args );
-
 		return $query_args;
 
 	} // End get_local_query_args
